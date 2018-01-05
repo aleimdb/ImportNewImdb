@@ -124,7 +124,7 @@ static int countCharFailed = 0;
         NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
-    const char *sqlStatementIdx4b = "CREATE INDEX idx_akamovies_titleId on movies(titleId)";
+    const char *sqlStatementIdx4b = "CREATE INDEX idx_akamovies_titleId on akamovies(titleId)";
     NSLog(@"%s",sqlStatementIdx4b);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx4b, NULL, NULL, &error) != SQLITE_OK)
     {
