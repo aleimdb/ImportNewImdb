@@ -2,8 +2,7 @@
 //  DDFileReader.h
 //  ImportNewImdb
 //
-//  Created by Alessandro Meroni on 08/08/17.
-//  Copyright © 2017 Alessandro Meroni. All rights reserved.
+// Dave's DDFileReader from http://stackoverflow.com/questions/3707427/how-to-read-data-from-nsfilehandle-line-by-line
 //
 
 #import <Foundation/Foundation.h>
