@@ -31,6 +31,10 @@ int main(int argc, const char * argv[]) {
                 l++;
                 if (l==1) {
                     NSLog(@"header: %@", line);
+                    if (![line isEqualToString:@"tconst\ttitleType\tprimaryTitle\toriginalTitle\tisAdult\tstartYear\tendYear\truntimeMinutes\tgenres\n"]) {
+                        NSLog(@"wrong format - not: tconst\ttitleType\tprimaryTitle\toriginalTitle\tisAdult\tstartYear\tendYear\truntimeMinutes\tgenres");
+                        exit(-1);
+                    }
                     continue;
                 }
                 @autoreleasepool {
@@ -62,6 +66,10 @@ int main(int argc, const char * argv[]) {
                 l++;
                 if (l==1) {
                     NSLog(@"header: %@", line);
+                    if (![line isEqualToString:@"titleId\tordering\ttitle\tregion\tlanguage\ttypes\tattributes\tisOriginalTitle\n"]) {
+                        NSLog(@"wrong format: - not titleId\tordering\ttitle\tregion\tlanguage\ttypes\tattributes\tisOriginalTitle");
+                        exit(-1);
+                    }
                     continue;
                 }
                 @autoreleasepool {
@@ -93,6 +101,10 @@ int main(int argc, const char * argv[]) {
                 l++;
                 if (l==1) {
                     NSLog(@"header: %@", line);
+                    if (![line isEqualToString:@"tconst\taverageRating\tnumVotes\n"]) {
+                        NSLog(@"wrong format - not: tconst\taverageRating\tnumVotes");
+                        exit(-1);
+                    }
                     continue;
                 }
                 @autoreleasepool {
@@ -124,6 +136,10 @@ int main(int argc, const char * argv[]) {
                 l++;
                 if (l==1) {
                     NSLog(@"header: %@", line);
+                    if (![line isEqualToString:@"tconst\tparentTconst\tseasonNumber\tepisodeNumber\n"]) {
+                        NSLog(@"wrong format - not tconst\tparentTconst\tseasonNumber\tepisodeNumber");
+                        exit(-1);
+                    }
                     continue;
                 }
                 @autoreleasepool {
@@ -145,7 +161,7 @@ int main(int argc, const char * argv[]) {
             [Movie commit];
         }
         
-        //tconst	principalCast
+        //tconst    ordering    nconst    category    job    characters
         @autoreleasepool {
             DDFileReader * reader = [[DDFileReader alloc] initWithFilePath:[path stringByAppendingString:@"/title.principals.tsv"]];
             long l = 0;
@@ -156,24 +172,25 @@ int main(int argc, const char * argv[]) {
                 l++;
                 if (l==1) {
                     NSLog(@"header: %@", line);
+                    if (![line isEqualToString:@"tconst\tordering\tnconst\tcategory\tjob\tcharacters\n"]) {
+                        NSLog(@"wrong format - not: tconst\tordering\tnconst\tcategory\tjob\tcharacters");
+                        exit(-1);
+                    }
                     continue;
                 }
                 @autoreleasepool {
                     NSArray *arr = [line componentsSeparatedByCharactersInSet:
                                     [NSCharacterSet characterSetWithCharactersInString:@"\t\n"]];
                     
-                    if(arr.count>=2){
-                        NSArray *arr2 = [arr[1] componentsSeparatedByCharactersInSet:
-                                        [NSCharacterSet characterSetWithCharactersInString:@",\n"]];
-                        NSInteger loc = 0;
-                        for (NSString* arrstr in arr2) {
-                            if(arrstr.length==0 || [arrstr isEqualToString:@"\\N"]){
-                                skip++;
-                            } else {
-                                loc++;
-                                [Movie insertCharacterWithNconst:arrstr tconst:arr[0] ttype:@"p" position:loc];
-                            }
-                        }
+                    if(arr.count>=6){
+                        [Movie insertCharacterWithNconst:arr[2]
+                                                  tconst:arr[0]
+                                                   ttype:@"p"
+                                                position:[arr[1] integerValue]
+                                                category:arr[3]
+                                                     job:arr[4]
+                                              characters:arr[5]];
+                        
                     }
                     else
                         NSLog(@"discarded: %@",line);
@@ -202,6 +219,10 @@ int main(int argc, const char * argv[]) {
                 l++;
                 if (l==1) {
                     NSLog(@"header: %@", line);
+                    if (![line isEqualToString:@"tconst\tdirectors\twriters\n"]) {
+                        NSLog(@"wrong format - not tconst\tdirectors\twriters");
+                        exit(-1);
+                    }
                     continue;
                 }
                 @autoreleasepool {
@@ -217,7 +238,13 @@ int main(int argc, const char * argv[]) {
                                 skipd++;
                             } else {
                                 locd++;
-                                [Movie insertCharacterWithNconst:arrstr tconst:arr[0] ttype:@"d" position:locd];
+                                [Movie insertCharacterWithNconst:arrstr
+                                                          tconst:arr[0]
+                                                           ttype:@"d"
+                                                        position:locd
+                                                        category:@"director"
+                                                             job:@"\\N"
+                                                      characters:@"\\N"];
                             }
                         }
                         NSArray *arr3 = [arr[2] componentsSeparatedByCharactersInSet:
@@ -228,7 +255,13 @@ int main(int argc, const char * argv[]) {
                                 skipw++;
                             } else {
                                 locw++;
-                                [Movie insertCharacterWithNconst:arrstr tconst:arr[0] ttype:@"w" position:locw];
+                                [Movie insertCharacterWithNconst:arrstr
+                                                          tconst:arr[0]
+                                                           ttype:@"w"
+                                                        position:locw
+                                                        category:@"writer"
+                                                             job:@"\\N"
+                                                      characters:@"\\N"];
                             }
                         }
                     }
@@ -259,6 +292,10 @@ int main(int argc, const char * argv[]) {
                 l++;
                 if (l==1) {
                     NSLog(@"header: %@", line);
+                    if (![line isEqualToString:@"nconst\tprimaryName\tbirthYear\tdeathYear\tprimaryProfession\tknownForTitles\n"]) {
+                        NSLog(@"wrong format - not nconst\tprimaryName\tbirthYear\tdeathYear\tprimaryProfession\tknownForTitles");
+                        exit(-1);
+                    }
                     continue;
                 }
                 @autoreleasepool {
@@ -275,7 +312,13 @@ int main(int argc, const char * argv[]) {
                                 skip++;
                             } else {
                                 loc++;
-                                [Movie insertCharacterWithNconst:arr[0] tconst:arrstr ttype:@"k" position:loc];
+                                [Movie insertCharacterWithNconst:arr[0]
+                                                          tconst:arrstr
+                                                           ttype:@"k"
+                                                        position:loc
+                                                        category:@"\\N"
+                                                             job:@"\\N"
+                                                      characters:@"\\N"];
                             }
                         }
                     }

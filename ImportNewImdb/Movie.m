@@ -65,7 +65,7 @@ static int countCharFailed = 0;
         NSAssert1(0, @"Error creating names. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
-    const char *sqlStatementChar = "CREATE TABLE characters(nconst varchar(30), tconst varchar(30), ttype varchar(1), position integer)";
+    const char *sqlStatementChar = "CREATE TABLE characters(nconst varchar(30), tconst varchar(30), ttype varchar(1), position integer, category varchar(30), job varchar(255), characters varchar(255))";
     if (sqlite3_exec(databaseLocal, sqlStatementChar, NULL, NULL, &error) != SQLITE_OK)
     {
         NSAssert1(0, @"Error creating characters. '%s'", sqlite3_errmsg(databaseLocal));
@@ -220,23 +220,14 @@ static int countCharFailed = 0;
     }
     
     [Movie bindString:tconst statement:addStmtMovie position:1];
-    //sqlite3_bind_text(addStmtMovie, 1, [tconst UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:titleType statement:addStmtMovie position:2];
-    //sqlite3_bind_text(addStmtMovie, 2, [titleType UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:primaryTitle statement:addStmtMovie position:3];
-    //sqlite3_bind_text(addStmtMovie, 3, [primaryTitle UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:originalTitle statement:addStmtMovie position:4];
-    //sqlite3_bind_text(addStmtMovie, 4, [originalTitle UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:isAdult statement:addStmtMovie position:5];
-    //sqlite3_bind_text(addStmtMovie, 5, [isAdult UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:startYear statement:addStmtMovie position:6];
-    //sqlite3_bind_text(addStmtMovie, 6, [startYear UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:endYear statement:addStmtMovie position:7];
-    //sqlite3_bind_text(addStmtMovie, 7, [endYear UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:runtimeMinutes statement:addStmtMovie position:8];
-    //sqlite3_bind_text(addStmtMovie, 8, [runtimeMinutes UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:genres statement:addStmtMovie position:9];
-    //sqlite3_bind_text(addStmtMovie, 9, [genres UTF8String], -1, SQLITE_TRANSIENT);
     
     if(SQLITE_DONE != sqlite3_step(addStmtMovie)) {
         NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
@@ -253,21 +244,13 @@ static int countCharFailed = 0;
     }
     
     [Movie bindString:tconst statement:addStmtMovie position:1];
-    //sqlite3_bind_text(addStmtMovie, 1, [tconst UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:ordering statement:addStmtMovie position:2];
-    //sqlite3_bind_text(addStmtMovie, 2, [ordering UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:title statement:addStmtMovie position:3];
-    //sqlite3_bind_text(addStmtMovie, 3, [title UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:region statement:addStmtMovie position:4];
-    //sqlite3_bind_text(addStmtMovie, 4, [region UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:language statement:addStmtMovie position:5];
-    //sqlite3_bind_text(addStmtMovie, 5, [language UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:types statement:addStmtMovie position:6];
-    //sqlite3_bind_text(addStmtMovie, 6, [types UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:attributes statement:addStmtMovie position:7];
-    //sqlite3_bind_text(addStmtMovie, 7, [attributes UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:isOriginalTitle statement:addStmtMovie position:8];
-    //sqlite3_bind_text(addStmtMovie, 8, [isOriginalTitle UTF8String], -1, SQLITE_TRANSIENT);
     
     if(SQLITE_DONE != sqlite3_step(addStmtMovie)) {
         NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
@@ -284,11 +267,8 @@ static int countCharFailed = 0;
     }
     
     [Movie bindString:tconst statement:addStmtMovieRating position:1];
-    //sqlite3_bind_text(addStmtMovieRating, 1, [tconst UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:averageRating statement:addStmtMovieRating position:2];
-    //sqlite3_bind_text(addStmtMovieRating, 2, [averageRating UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:numVotes statement:addStmtMovieRating position:3];
-    //sqlite3_bind_text(addStmtMovieRating, 3, [numVotes UTF8String], -1, SQLITE_TRANSIENT);
     
     if(SQLITE_DONE != sqlite3_step(addStmtMovieRating)) {
         NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
@@ -305,13 +285,9 @@ static int countCharFailed = 0;
     }
     
     [Movie bindString:tconst statement:addStmtMovieEpisode position:1];
-    //sqlite3_bind_text(addStmtMovieEpisode, 1, [tconst UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:parentTconst statement:addStmtMovieEpisode position:2];
-    //sqlite3_bind_text(addStmtMovieEpisode, 2, [parentTconst UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:seasonNumber statement:addStmtMovieEpisode position:3];
-    //sqlite3_bind_text(addStmtMovieEpisode, 3, [seasonNumber UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:episodeNumber statement:addStmtMovieEpisode position:4];
-    //sqlite3_bind_text(addStmtMovieEpisode, 4, [episodeNumber UTF8String], -1, SQLITE_TRANSIENT);
     
     if(SQLITE_DONE != sqlite3_step(addStmtMovieEpisode)) {
         NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
@@ -328,15 +304,10 @@ static int countCharFailed = 0;
     }
     
     [Movie bindString:nconst statement:addStmtName position:1];
-    //sqlite3_bind_text(addStmtName, 1, [nconst UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:primaryName statement:addStmtName position:2];
-    //sqlite3_bind_text(addStmtName, 2, [primaryName UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:birthYear statement:addStmtName position:3];
-    //sqlite3_bind_text(addStmtName, 3, [birthYear UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:deathYear statement:addStmtName position:4];
-    //sqlite3_bind_text(addStmtName, 4, [deathYear UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:primaryProfession statement:addStmtName position:5];
-    //sqlite3_bind_text(addStmtName, 5, [primaryProfession UTF8String], -1, SQLITE_TRANSIENT);
     
     if(SQLITE_DONE != sqlite3_step(addStmtName)) {
         NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
@@ -345,20 +316,20 @@ static int countCharFailed = 0;
     
 }
 
-+ (void) insertCharacterWithNconst:(NSString*)nconst tconst:(NSString*)tconst ttype:(NSString*)ttype position:(NSInteger) position {
++ (void) insertCharacterWithNconst:(NSString*)nconst tconst:(NSString*)tconst ttype:(NSString*)ttype position:(NSInteger) position category:(NSString*)category job:(NSString*)job characters:(NSString*)characters{
     if(addStmtChar == nil) {
-        char *insertSQLChar = "INSERT INTO characters(nconst, tconst, ttype, position) VALUES (?,?,?,?)";
+        char *insertSQLChar = "INSERT INTO characters(nconst, tconst, ttype, position, category, job, characters) VALUES (?,?,?,?,?,?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLChar, -1, &addStmtChar, NULL) != SQLITE_OK)
             NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     [Movie bindString:nconst statement:addStmtChar position:1];
-    //sqlite3_bind_text(addStmtChar, 1, [nconst UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:tconst statement:addStmtChar position:2];
-    //sqlite3_bind_text(addStmtChar, 2, [tconst UTF8String], -1, SQLITE_TRANSIENT);
     [Movie bindString:ttype statement:addStmtChar position:3];
-    //sqlite3_bind_text(addStmtChar, 3, [ttype UTF8String], -1, SQLITE_TRANSIENT);
     sqlite3_bind_int (addStmtChar, 4, (int)position);
+    [Movie bindString:category statement:addStmtChar position:5];
+    [Movie bindString:job statement:addStmtChar position:6];
+    [Movie bindString:characters statement:addStmtChar position:7];
     
     if(SQLITE_DONE != sqlite3_step(addStmtChar)) {
         //NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
