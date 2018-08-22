@@ -63,7 +63,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/alessandro/Downloads/newimdb20180513"
+            argument = "/Users/alessandro/Downloads/newimdb20180822"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

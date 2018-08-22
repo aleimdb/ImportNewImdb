@@ -201,6 +201,28 @@ static int countCharFailed = 0;
         NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
+    const char *sqlStatementIdx7 = "CREATE TABLE mstats ( stat varchar(255) )";
+    NSLog(@"%s",sqlStatementIdx7);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx7, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating mmovies_local7. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    sqlite3_stmt *statsStmt = nil;
+    
+    char *insertSQLMovie = "INSERT INTO mstats(stat) VALUES (?)";
+    if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &statsStmt, NULL) != SQLITE_OK)
+        NSAssert1(0, @"Error while creating stats statement. '%s'", sqlite3_errmsg(databaseLocal));
+    
+    NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    
+    sqlite3_bind_text(statsStmt,1,[[dateFormatter stringFromDate:[NSDate date]] UTF8String],-1,SQLITE_TRANSIENT);
+    
+    if(SQLITE_DONE != sqlite3_step(statsStmt)) {
+        NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    sqlite3_reset(statsStmt);
 }
 
 +(void) bindString:(NSString*)myString statement:(sqlite3_stmt*)statement position:(int)position{
