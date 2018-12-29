@@ -26,6 +26,7 @@
 
 + (void) insertCharacterWithNconst:(NSString*)nconst tconst:(NSString*)tconst ttype:(NSString*)ttype position:(NSInteger) position category:(NSString*)category job:(NSString*)job characters:(NSString*)characters;
 
++ (void) importAwards;
 + (void) closeDb;
 + (void) begin;
 + (void) commit;

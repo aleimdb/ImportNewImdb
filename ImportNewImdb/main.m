@@ -338,6 +338,8 @@ int main(int argc, const char * argv[]) {
         }
         //[Movie createIdxChar_tmp];
         
+        [Movie importAwards];
+        
         [Movie createIdxChar_final];
         
         [Movie createLocalTables];

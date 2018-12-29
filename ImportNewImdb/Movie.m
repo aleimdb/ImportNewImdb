@@ -82,6 +82,15 @@ static int countCharFailed = 0;
     {
         NSAssert1(0, @"Error creating episodes. '%s'", sqlite3_errmsg(databaseLocal));
     }
+    
+    const char *sqlStatementAwards = "CREATE TABLE awards(eventEditionId varchar(50), eventName varchar(100), eventYear varchar(10), awardName varchar(255), categoryName varchar(255), name varchar(255), tconst varchar(30), winner varchar(4), prisec varchar(4), notes varchar(1024), ref varchar(30))";
+    if (sqlite3_exec(databaseLocal, sqlStatementAwards, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating awards. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    
+
 
 }
 
@@ -142,6 +151,20 @@ static int countCharFailed = 0;
     const char *sqlStatementIdx6 = "CREATE INDEX idx_ratings_tconst on ratings(tconst)";
     NSLog(@"%s",sqlStatementIdx6);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx6, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx7 = "CREATE INDEX idx_awards_tconst on awards(tconst)";
+    NSLog(@"%s",sqlStatementIdx7);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx7, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx8 = "CREATE INDEX idx_awards_tconst on awards(ref)";
+    NSLog(@"%s",sqlStatementIdx8);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx8, NULL, NULL, &error) != SQLITE_OK)
     {
         NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
@@ -362,6 +385,73 @@ static int countCharFailed = 0;
     sqlite3_reset(addStmtChar);
     
 }
+
+
++ (void) importAwards {
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = paths[0];
+    NSString* newDbName = [documentsDirectory stringByAppendingString:@"/aw.sqlite"];
+    NSLog(@"db path: %@", newDbName);
+    
+    
+    NSFileManager *manager = [NSFileManager defaultManager];
+    if( ![manager fileExistsAtPath:newDbName] )
+    {
+        NSLog(@"no awards db");
+        return;
+    }
+    
+    sqlite3 *databaseAwards = nil;
+    
+    if (sqlite3_open([newDbName UTF8String], &databaseAwards) != SQLITE_OK) {
+        sqlite3_close(databaseAwards); //Even though the open call failed, close the database connection to release all the memory.
+        NSAssert1(0, @"Error creating awards db. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    //eventName, eventYear, awardName, categoryName, name, tconst, winner, prisec, notes, ref, eventEditionId
+    const char *sql1 = "select ifnull(eventName,''), ifnull(eventYear,''), ifnull(awardName,''), ifnull(categoryName,''), ifnull(name,''), ifnull(tconst,''), ifnull(winner,''), ifnull(prisec,''), ifnull(notes,''), ifnull(ref,''), ifnull(eventEditionId,'') from awards";
+    
+    sqlite3_stmt *selectstmt;
+    if(sqlite3_prepare_v2(databaseAwards, sql1, -1, &selectstmt, NULL) == SQLITE_OK) {
+        
+        char *insertSQLMovie = "INSERT INTO awards(eventName, eventYear, awardName, categoryName, name, tconst, winner, prisec, notes, ref, eventEditionId) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+        if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovie, NULL) != SQLITE_OK)
+            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+        
+        sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
+        
+        while(sqlite3_step(selectstmt) == SQLITE_ROW) {
+            
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 0)] statement:addStmtMovie position:1];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 1)] statement:addStmtMovie position:2];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 2)] statement:addStmtMovie position:3];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 3)] statement:addStmtMovie position:4];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 4)] statement:addStmtMovie position:5];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 5)] statement:addStmtMovie position:6];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 6)] statement:addStmtMovie position:7];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 7)] statement:addStmtMovie position:8];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 8)] statement:addStmtMovie position:9];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 9)] statement:addStmtMovie position:10];
+            [Movie bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 10)] statement:addStmtMovie position:11];
+            
+            if(SQLITE_DONE != sqlite3_step(addStmtMovie)) {
+                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+            }
+            sqlite3_reset(addStmtMovie);
+            
+        }
+        sqlite3_exec(databaseLocal, "COMMIT", 0, 0, 0);
+
+        NSLog(@"finished mmovies - commit done");
+    }
+    
+    sqlite3_reset(selectstmt);
+    
+    sqlite3_close(databaseAwards);
+    
+    NSLog(@"updates imported from awards file");
+}
+
 
 + (void) closeDb {
     sqlite3_close(databaseLocal);
