@@ -89,9 +89,6 @@ static int countCharFailed = 0;
         NSAssert1(0, @"Error creating awards. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
-    
-
-
 }
 
 + (void) createIdxChar_final {
@@ -102,71 +99,70 @@ static int countCharFailed = 0;
     NSLog(@"%s",sqlStatementIdx1);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx1, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_char_nconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx2 = "CREATE INDEX idx_char_tconst on characters(tconst)";
     NSLog(@"%s",sqlStatementIdx2);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx2, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_char_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx3 = "CREATE INDEX idx_epi_tconst on episodes(tconst)";
     NSLog(@"%s",sqlStatementIdx3);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx3, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_epi_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx3b = "CREATE INDEX idx_epi_ptconst on episodes(parenttconst)";
     NSLog(@"%s",sqlStatementIdx3b);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx3b, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_epi_ptconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx4 = "CREATE INDEX idx_movies_tconst on movies(tconst)";
     NSLog(@"%s",sqlStatementIdx4);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx4, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_movies_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx4b = "CREATE INDEX idx_akamovies_titleId on akamovies(titleId)";
     NSLog(@"%s",sqlStatementIdx4b);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx4b, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_akamovies_titleId. '%s'", sqlite3_errmsg(databaseLocal));
     }
 
-    
     const char *sqlStatementIdx5 = "CREATE INDEX idx_names_nconst on names(nconst)";
     NSLog(@"%s",sqlStatementIdx5);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx5, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_names_nconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx6 = "CREATE INDEX idx_ratings_tconst on ratings(tconst)";
     NSLog(@"%s",sqlStatementIdx6);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx6, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx7 = "CREATE INDEX idx_awards_tconst on awards(tconst)";
     NSLog(@"%s",sqlStatementIdx7);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx7, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_awards_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
-    const char *sqlStatementIdx8 = "CREATE INDEX idx_awards_tconst on awards(ref)";
+    const char *sqlStatementIdx8 = "CREATE INDEX idx_awards_ref on awards(ref)";
     NSLog(@"%s",sqlStatementIdx8);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx8, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error creating idx_awards_ref. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
 }
