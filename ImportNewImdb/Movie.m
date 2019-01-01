@@ -165,6 +165,20 @@ static int countCharFailed = 0;
         NSAssert1(0, @"Error creating idx_awards_ref. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
+    const char *sqlStatementIdx9 = "create index ratings_tconst on ratings(tconst)";
+    NSLog(@"%s",sqlStatementIdx9);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx9, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx10 = "create index movies_year on movies(startyear)";
+    NSLog(@"%s",sqlStatementIdx10);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx10, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
 }
 
 + (void) createLocalTables {
