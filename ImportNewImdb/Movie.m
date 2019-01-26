@@ -179,7 +179,7 @@ static int countCharFailed = 0;
         NSAssert1(0, @"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
-    const char *sqlStatementIdx11 = "create table movieratings as select m.tconst, m.primarytitle, m.originaltitle, m.startyear,m.genres, cast (numvotes as number) numvotes from movies m, ratings where m.tconst=ratings.tconst and cast (numvotes as number)>10000 order by cast (numvotes as number) desc";
+    const char *sqlStatementIdx11 = "create table movieratings as select m.tconst, m.primarytitle, m.originaltitle, m.startyear,m.genres, m.titletype, cast (numvotes as number) numvotes, cast (averageRating as number) rating  from movies m, ratings where m.tconst=ratings.tconst and cast (numvotes as number)>5000 order by cast (numvotes as number) desc";
     NSLog(@"%s",sqlStatementIdx11);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx11, NULL, NULL, &error) != SQLITE_OK)
     {
