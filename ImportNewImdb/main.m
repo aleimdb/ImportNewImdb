@@ -336,8 +336,7 @@ int main(int argc, const char * argv[]) {
             [Movie commit];
             [Movie printChar];
         }
-        //[Movie createIdxChar_tmp];
-        
+
         [Movie importAwards];
         
         [Movie createIdxChar_final];

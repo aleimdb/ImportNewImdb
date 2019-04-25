@@ -179,7 +179,7 @@ static int countCharFailed = 0;
         NSAssert1(0, @"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
-    const char *sqlStatementIdx11 = "create table movieratings as select m.tconst, m.primarytitle, m.originaltitle, m.startyear,m.genres, m.titletype, cast (numvotes as number) numvotes, cast (averageRating as number) rating  from movies m, ratings where m.tconst=ratings.tconst and cast (numvotes as number)>5000 order by cast (numvotes as number) desc";
+    const char *sqlStatementIdx11 = "create table movieratings as select m.tconst, m.primarytitle, m.originaltitle, m.startyear,m.genres, m.titletype, cast (numvotes as number) numvotes, cast (averageRating as number) rating,'' as posit, '' as positsci from movies m, ratings where m.tconst=ratings.tconst and cast (numvotes as number)>1000 and titletype <> 'tvEpisode' order by cast (numvotes as number) desc";
     NSLog(@"%s",sqlStatementIdx11);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx11, NULL, NULL, &error) != SQLITE_OK)
     {
@@ -193,6 +193,73 @@ static int countCharFailed = 0;
         NSAssert1(0, @"Error creating movieratings_year. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
+    const char *sqlStatementIdx13 = "create index movieratings_tconst on movieratings(tconst)";
+    NSLog(@"%s",sqlStatementIdx13);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx13, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating movieratings_year. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    NSLog(@"updating posit");
+    NSString* nsSql = @"WITH RECURSIVE cnt(x) AS ( SELECT 1 UNION ALL SELECT x+1 FROM cnt LIMIT 3000) SELECT cast(x as varchar) x FROM cnt where x>=1900 and x<2030 order by 1 desc";
+    sqlite3_stmt *selectstmt;
+    sqlite3_prepare_v2(databaseLocal, [nsSql UTF8String], -1, &selectstmt, NULL);
+    
+    NSString* nsSql1 = @"select a.tconst from movieratings a where a.startyear=? order by numvotes desc";
+    sqlite3_stmt *selectstmt1;
+    sqlite3_prepare_v2(databaseLocal, [nsSql1 UTF8String], -1, &selectstmt1, NULL);
+    
+    NSString* nsSql2 = @"select a.tconst from movieratings a where a.startyear=? and genres like '%Sci-Fi%' order by numvotes desc";
+    sqlite3_stmt *selectstmt2;
+    sqlite3_prepare_v2(databaseLocal, [nsSql2 UTF8String], -1, &selectstmt2, NULL);
+    
+    while(sqlite3_step(selectstmt) == SQLITE_ROW) {
+        
+        NSString* year = [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 0)];
+        
+        sqlite3_bind_text(selectstmt1, 1, [year UTF8String], -1, SQLITE_TRANSIENT);
+        
+        int i = 1;
+        NSString *primaryKey;
+        NSString *updStatement;
+        
+        while(sqlite3_step(selectstmt1) == SQLITE_ROW) {
+            
+            primaryKey = [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt1, 0)];
+            
+            updStatement = [NSString stringWithFormat:@"update movieratings set posit = '%@-%i' where tconst = '%@'",year,i,primaryKey];
+            
+            if ( sqlite3_exec(databaseLocal, [updStatement UTF8String], NULL, NULL, &error) != SQLITE_OK)
+            {
+                NSAssert1(0, @"Error while creating updStatement statement. '%s'", sqlite3_errmsg(database));
+            }
+            
+            i++;
+        }
+        sqlite3_reset(selectstmt1);
+        
+        
+        sqlite3_bind_text(selectstmt2, 1, [year UTF8String], -1, SQLITE_TRANSIENT);
+        
+        i = 1;
+        
+        while(sqlite3_step(selectstmt2) == SQLITE_ROW) {
+            
+            primaryKey = [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt2, 0)];
+            
+            updStatement = [NSString stringWithFormat:@"update movieratings set positsci = '%@-%i' where tconst = '%@'",year,i,primaryKey];
+            
+            if ( sqlite3_exec(databaseLocal, [updStatement UTF8String], NULL, NULL, &error) != SQLITE_OK)
+            {
+                NSAssert1(0, @"Error while creating updStatement statement. '%s'", sqlite3_errmsg(database));
+            }
+            
+            i++;
+        }
+        sqlite3_reset(selectstmt2);
+    }
+    sqlite3_reset(selectstmt);
+    NSLog(@"updating posit done");
 }
 
 + (void) createLocalTables {
