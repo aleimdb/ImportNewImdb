@@ -199,6 +199,34 @@ static int countCharFailed = 0;
     {
         NSAssert1(0, @"Error creating movieratings_year. '%s'", sqlite3_errmsg(databaseLocal));
     }
+
+    const char *sqlStatementIdx14 = "CREATE INDEX idx_movies_primarytitle ON movies(primarytitle COLLATE NOCASE)";
+    NSLog(@"%s",sqlStatementIdx14);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx14, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating idx_movies_primarytitle. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx15 = "CREATE INDEX idx_movies_originaltitle ON movies(originaltitle COLLATE NOCASE)";
+    NSLog(@"%s",sqlStatementIdx15);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx15, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating idx_movies_originaltitle. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx16 = "CREATE INDEX idx_akamovies_title ON akamovies(title COLLATE NOCASE)";
+    NSLog(@"%s",sqlStatementIdx16);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx16, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating idx_akamovies_title. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx18 = "CREATE INDEX idx_names_primaryname ON names(primaryname COLLATE NOCASE)";
+    NSLog(@"%s",sqlStatementIdx18);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx18, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating idx_names_primaryname. '%s'", sqlite3_errmsg(databaseLocal));
+    }
     
     NSLog(@"updating posit");
     NSString* nsSql = @"WITH RECURSIVE cnt(x) AS ( SELECT 1 UNION ALL SELECT x+1 FROM cnt LIMIT 3000) SELECT cast(x as varchar) x FROM cnt where x>=1900 and x<2030 order by 1 desc";
