@@ -7,44 +7,90 @@
 
 #import "DDFileReader.h"
 
-@interface NSData (DDAdditions)
+//@interface NSData (DDAdditions)
+//
+//- (NSRange) rangeOfData_dd:(NSData *)dataToFind startFrom:(NSUInteger) startIndex;
+//
+//@end
+//
+//@implementation NSData (DDAdditions)
+//
+//- (NSRange) rangeOfData_dd:(NSData *)dataToFind startFrom:(NSUInteger) startIndex {
+//
+//    const void * bytes = [self bytes];
+//    NSUInteger length = [self length];
+//
+//    const void * searchBytes = [dataToFind bytes];
+//    NSUInteger searchLength = [dataToFind length];
+//    NSUInteger searchIndex = startIndex;
+//
+//    NSRange foundRange = {NSNotFound, searchLength};
+//    for (NSUInteger index = startIndex; index < length; index++) {
+//        if (((char *)bytes)[index] == ((char *)searchBytes)[searchIndex]) {
+//            //the current character matches
+//            if (foundRange.location == NSNotFound) {
+//                foundRange.location = index;
+//            }
+//            searchIndex++;
+//            if (searchIndex >= searchLength) { return foundRange; }
+//        } else {
+//            searchIndex = 0;
+//            foundRange.location = NSNotFound;
+//        }
+//    }
+//    return foundRange;
+//}
+//
+//@end
 
-- (NSRange) rangeOfData_dd:(NSData *)dataToFind;
+@implementation NSString (SSToolkitAdditions)
 
-@end
+#pragma mark Trimming Methods
 
-@implementation NSData (DDAdditions)
-
-- (NSRange) rangeOfData_dd:(NSData *)dataToFind {
-    
-    const void * bytes = [self bytes];
-    NSUInteger length = [self length];
-    
-    const void * searchBytes = [dataToFind bytes];
-    NSUInteger searchLength = [dataToFind length];
-    NSUInteger searchIndex = 0;
-    
-    NSRange foundRange = {NSNotFound, searchLength};
-    for (NSUInteger index = 0; index < length; index++) {
-        if (((char *)bytes)[index] == ((char *)searchBytes)[searchIndex]) {
-            //the current character matches
-            if (foundRange.location == NSNotFound) {
-                foundRange.location = index;
-            }
-            searchIndex++;
-            if (searchIndex >= searchLength) { return foundRange; }
-        } else {
-            searchIndex = 0;
-            foundRange.location = NSNotFound;
-        }
+- (NSString *)stringByTrimmingLeadingCharactersInSet:(NSCharacterSet *)characterSet {
+    NSRange rangeOfFirstWantedCharacter = [self rangeOfCharacterFromSet:[characterSet invertedSet]];
+    if (rangeOfFirstWantedCharacter.location == NSNotFound) {
+        return @"";
     }
-    return foundRange;
+    return [self substringFromIndex:rangeOfFirstWantedCharacter.location];
 }
 
+- (NSString *)stringByTrimmingLeadingWhitespaceAndNewlineCharacters {
+    return [self stringByTrimmingLeadingCharactersInSet:
+            [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+}
 @end
 
 @implementation DDFileReader
-@synthesize lineDelimiter, chunkSize;
+@synthesize nLines;
+//@synthesize lineDelimiter, chunkSize;
+
+-(NSUInteger) getLines:(NSString *)aPath {
+    NSTask *task = [[NSTask alloc] init];
+    NSPipe *pipe = [NSPipe pipe];
+    NSFileHandle *file = pipe.fileHandleForReading;
+    [task setLaunchPath:@"/usr/bin/wc"];
+    [task setArguments:[NSArray arrayWithObjects:@"-l", aPath, nil]];
+    [task setStandardOutput:pipe];
+    [task setStandardInput:[NSPipe pipe]];
+
+    [task launch];
+    NSData *data = [file readDataToEndOfFile];
+    [file closeFile];
+
+    NSString *wcOutput = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+    
+    wcOutput = [wcOutput stringByTrimmingLeadingWhitespaceAndNewlineCharacters];
+    
+    NSRange ran = [wcOutput rangeOfString:@" " options:NSLiteralSearch];
+    wcOutput = [wcOutput substringWithRange:NSMakeRange(0, ran.location)];
+    
+    NSUInteger nLines = [wcOutput longLongValue];
+    
+    //NSLog (@"%@", nLines);
+    return nLines;
+    
+}
 
 - (id) initWithFilePath:(NSString *)aPath {
     if (self = [super init]) {
@@ -56,47 +102,74 @@
         
         lineDelimiter = @"\n";
         currentOffset = 0ULL;
-        chunkSize = 128ULL;
+        chunkSize = 1024000ULL;
         [fileHandle seekToEndOfFile];
         totalFileLength = [fileHandle offsetInFile];
         //we don't need to seek back, since readLine will do that.
-        NSLog(@"%@ - totalFileLength: %llu", aPath, totalFileLength);
+        nLines = [self getLines:aPath];
+        NSLog(@"%@ - totalFileLength: %llu - nLines: %lu", aPath, totalFileLength, nLines);
+        
+        [fileHandle seekToFileOffset:currentOffset];
+        @autoreleasepool {
+            NSData* prevChunk = [fileHandle readDataOfLength:chunkSize];
+            prevChunkString = [[NSString alloc] initWithData:prevChunk encoding:NSUTF8StringEncoding];
+            currentOffset += [prevChunk length];
+            offsetInPrevChunkString = 0ULL;
+        }
     }
     return self;
 }
 
 - (void) dealloc {
+    NSLog(@"called dealloc");
     [fileHandle closeFile];
     currentOffset = 0ULL;
-    
 }
 
 - (NSString *) readLine {
-    if (currentOffset >= totalFileLength) { return nil; }
     
-    NSData * newLineData = [lineDelimiter dataUsingEncoding:NSUTF8StringEncoding];
-    [fileHandle seekToFileOffset:currentOffset];
-    NSMutableData * currentData = [[NSMutableData alloc] init];
-    BOOL shouldReadMore = YES;
+    NSString * line = @"";
     
-    @autoreleasepool {
+    //NSData * newLineData = [lineDelimiter dataUsingEncoding:NSUTF8StringEncoding];
         
-        while (shouldReadMore) {
-            if (currentOffset >= totalFileLength) { break; }
-            NSData * chunk = [fileHandle readDataOfLength:chunkSize];
-            NSRange newLineRange = [chunk rangeOfData_dd:newLineData];
-            if (newLineRange.location != NSNotFound) {
-                
-                //include the length so we can include the delimiter in the string
-                chunk = [chunk subdataWithRange:NSMakeRange(0, newLineRange.location+[newLineData length])];
-                shouldReadMore = NO;
+    NSRange newLineRange = [prevChunkString rangeOfString:lineDelimiter options:NSLiteralSearch range:NSMakeRange(offsetInPrevChunkString,[prevChunkString length]-offsetInPrevChunkString) ];
+    
+    if (newLineRange.location != NSNotFound) {
+        line = [prevChunkString substringWithRange:NSMakeRange(offsetInPrevChunkString,newLineRange.location - offsetInPrevChunkString + [lineDelimiter length]) ];
+        offsetInPrevChunkString = newLineRange.location + [lineDelimiter length];
+    } else {
+        if (currentOffset >= totalFileLength) { return nil; }
+        
+        NSString* prevChunkRemainString = [prevChunkString substringWithRange:NSMakeRange(offsetInPrevChunkString,[prevChunkString length]-offsetInPrevChunkString)];
+        
+        [fileHandle seekToFileOffset:currentOffset];
+        NSString* newChunkString;
+        @autoreleasepool {
+            NSData * newChunk = [fileHandle readDataOfLength:chunkSize];
+            currentOffset += [newChunk length];
+            
+            newChunkString = [[NSString alloc] initWithData:newChunk encoding:NSUTF8StringEncoding];
+            if(newChunkString==nil) {
+                newChunkString = [[NSString alloc] initWithData:newChunk encoding:NSISOLatin1StringEncoding];
             }
-            [currentData appendData:chunk];
-            currentOffset += [chunk length];
+        }
+        prevChunkString = [prevChunkRemainString stringByAppendingString:newChunkString];
+        offsetInPrevChunkString = 0ULL;
+
+//        [prevChunkRemain appendData:newChunk];
+//        prevChunk = prevChunkRemain;
+//        prevChunkString = [[NSString alloc] initWithData:prevChunk encoding:NSUTF8StringEncoding];
+        
+        newLineRange = [prevChunkString rangeOfString:lineDelimiter options:NSLiteralSearch range:NSMakeRange(offsetInPrevChunkString,[prevChunkString length]-offsetInPrevChunkString) ];
+        
+        if (newLineRange.location != NSNotFound) {
+            line = [prevChunkString substringWithRange:NSMakeRange(offsetInPrevChunkString,newLineRange.location - offsetInPrevChunkString + [lineDelimiter length]) ];
+            offsetInPrevChunkString = newLineRange.location + [lineDelimiter length];
+        } else {
+            NSLog(@"error");
         }
     }
     
-    NSString * line = [[NSString alloc] initWithData:currentData encoding:NSUTF8StringEncoding];
     return line;
 }
 

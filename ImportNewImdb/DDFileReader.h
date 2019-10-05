@@ -16,10 +16,15 @@
     
     NSString * lineDelimiter;
     NSUInteger chunkSize;
+    
+    NSUInteger nLines;
+    
+    NSString * prevChunkString;
+    NSUInteger offsetInPrevChunkString;
 }
 
-@property (nonatomic, copy) NSString * lineDelimiter;
-@property (nonatomic) NSUInteger chunkSize;
+//@property (nonatomic, copy) NSString * lineDelimiter;
+@property (nonatomic) NSUInteger nLines;
 
 - (id) initWithFilePath:(NSString *)aPath;
 
