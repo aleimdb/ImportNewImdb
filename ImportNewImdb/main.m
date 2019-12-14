@@ -11,14 +11,24 @@
 #import "Movie.h"
 
 int main(int argc, const char * argv[]) {
-        
+    
     if(argc != 2) {
-        NSLog(@"usage: importNewImdb path_to_folder");
+        NSLog(@"usage: importNewImdb path_to_folder|onlyAwards");
         return 1;
     }
     NSString* path = [NSString stringWithUTF8String:argv[1]];
     
+    if([path isEqualToString:@"onlyAwards"]) {
+        NSLog(@"onlyAwards detected");
+        Movie* movie = [[Movie alloc] init];
+        //[movie createAwardsTables];
+        [movie importAwards];
+        [movie closeDb];
+        return 0;
+    }
+    
     [Movie createDb];
+    
     //tconst	titleType	primaryTitle	originalTitle	isAdult	startYear	endYear	runtimeMinutes	genres
     @autoreleasepool {
         
@@ -57,7 +67,7 @@ int main(int argc, const char * argv[]) {
         [movie commit];
         [movie closeDb];
     }
-        
+    
     //titleId    ordering    title    region    language    types    attributes    isOriginalTitle
     @autoreleasepool {
         DDFileReader * reader = [[DDFileReader alloc] initWithFilePath:[path stringByAppendingString:@"/title.akas.tsv"]];
@@ -94,7 +104,7 @@ int main(int argc, const char * argv[]) {
         [movie commit];
         [movie closeDb];
     }
-        
+    
     //tconst	averageRating	numVotes
     @autoreleasepool {
         DDFileReader * reader = [[DDFileReader alloc] initWithFilePath:[path stringByAppendingString:@"/title.ratings.tsv"]];
@@ -131,7 +141,7 @@ int main(int argc, const char * argv[]) {
         [movie commit];
         [movie closeDb];
     }
-        
+    
     //tconst	parentTconst	seasonNumber	episodeNumber
     @autoreleasepool {
         DDFileReader * reader = [[DDFileReader alloc] initWithFilePath:[path stringByAppendingString:@"/title.episode.tsv"]];
@@ -168,7 +178,7 @@ int main(int argc, const char * argv[]) {
         [movie commit];
         [movie closeDb];
     }
-        
+    
     //tconst    ordering    nconst    category    job    characters
     @autoreleasepool {
         DDFileReader * reader = [[DDFileReader alloc] initWithFilePath:[path stringByAppendingString:@"/title.principals.tsv"]];
@@ -215,7 +225,7 @@ int main(int argc, const char * argv[]) {
         [movie commit];
         [movie closeDb];
     }
-        
+    
     //tconst	directors	writers
     @autoreleasepool {
         DDFileReader * reader = [[DDFileReader alloc] initWithFilePath:[path stringByAppendingString:@"/title.crew.tsv"]];
@@ -349,10 +359,12 @@ int main(int argc, const char * argv[]) {
     
     @autoreleasepool {
         Movie* movie = [[Movie alloc] init];
+        [movie createAwardsTables];
         [movie importAwards];
         [movie createIdxChar_final];
         [movie createLocalTables];
         [movie closeDb];
     }
+    
     return 0;
 }

@@ -111,13 +111,7 @@
     {
         NSAssert1(0, @"Error creating episodes. '%s'", sqlite3_errmsg(databaseGlobal));
     }
-    
-    const char *sqlStatementAwards = "CREATE TABLE awards(eventEditionId varchar(50), eventName varchar(100), eventYear varchar(10), awardName varchar(255), categoryName varchar(255), name varchar(255), tconst varchar(30), winner varchar(4), prisec varchar(4), notes varchar(1024), ref varchar(30))";
-    if (sqlite3_exec(databaseGlobal, sqlStatementAwards, NULL, NULL, &error) != SQLITE_OK)
-    {
-        NSAssert1(0, @"Error creating awards. '%s'", sqlite3_errmsg(databaseGlobal));
-    }
-    
+        
     sqlite3_close(databaseGlobal);
     
 }
@@ -181,21 +175,7 @@
     {
         NSAssert1(0, @"Error creating idx_ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
-    
-    const char *sqlStatementIdx7 = "CREATE INDEX idx_awards_tconst on awards(tconst)";
-    NSLog(@"%s",sqlStatementIdx7);
-    if (sqlite3_exec(databaseLocal, sqlStatementIdx7, NULL, NULL, &error) != SQLITE_OK)
-    {
-        NSAssert1(0, @"Error creating idx_awards_tconst. '%s'", sqlite3_errmsg(databaseLocal));
-    }
-    
-    const char *sqlStatementIdx8 = "CREATE INDEX idx_awards_ref on awards(ref)";
-    NSLog(@"%s",sqlStatementIdx8);
-    if (sqlite3_exec(databaseLocal, sqlStatementIdx8, NULL, NULL, &error) != SQLITE_OK)
-    {
-        NSAssert1(0, @"Error creating idx_awards_ref. '%s'", sqlite3_errmsg(databaseLocal));
-    }
-    
+        
     const char *sqlStatementIdx9 = "create index ratings_tconst on ratings(tconst)";
     NSLog(@"%s",sqlStatementIdx9);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx9, NULL, NULL, &error) != SQLITE_OK)
@@ -398,6 +378,59 @@
     sqlite3_reset(statsStmt);
 }
 
+- (void) createAwardsTables {
+    
+    char *error;
+    
+    const char *sqlStatementAwards = "CREATE TABLE awards(eventEditionId varchar(50), eventName varchar(100), eventYear varchar(10), awardName varchar(255), categoryName varchar(255), name varchar(255), tconst varchar(30), winner varchar(4), prisec varchar(4), notes varchar(1024), ref varchar(30))";
+    if (sqlite3_exec(databaseLocal, sqlStatementAwards, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating awards. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx7 = "CREATE INDEX idx_awards_tconst on awards(tconst)";
+    NSLog(@"%s",sqlStatementIdx7);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx7, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating idx_awards_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx8 = "CREATE INDEX idx_awards_ref on awards(ref)";
+    NSLog(@"%s",sqlStatementIdx8);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx8, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating idx_awards_ref. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementAwards1 = "CREATE TABLE awArray (label varchar(100))";
+    if (sqlite3_exec(databaseLocal, sqlStatementAwards1, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating awards1. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    const char *sqlStatementAwards2 = "CREATE TABLE awDictAwardName (label varchar(100),name varchar(100))";
+    if (sqlite3_exec(databaseLocal, sqlStatementAwards2, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating awards2. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    const char *sqlStatementAwards3 = "CREATE TABLE awDictCategoryName (label varchar(100),cat varchar(500))";
+    if (sqlite3_exec(databaseLocal, sqlStatementAwards3, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating awards3. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    const char *sqlStatementAwards4 = "CREATE TABLE awDictEventName (label varchar(100),name varchar(100))";
+    if (sqlite3_exec(databaseLocal, sqlStatementAwards4, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating awards4. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    const char *sqlStatementAwards5 = "CREATE TABLE awDictType (label varchar(100),type varchar(100))";
+    if (sqlite3_exec(databaseLocal, sqlStatementAwards5, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error creating awards5. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+}
+
+
 -(void) bindString:(NSString*)myString statement:(sqlite3_stmt*)statement position:(int)position{
     if (myString && ![myString isEqualToString:@"\\N"])
         sqlite3_bind_text(statement,position,[myString UTF8String],-1,SQLITE_TRANSIENT);
@@ -543,7 +576,6 @@
     NSString* newDbName = [documentsDirectory stringByAppendingString:@"/aw.sqlite"];
     NSLog(@"db path: %@", newDbName);
     
-    
     NSFileManager *manager = [NSFileManager defaultManager];
     if( ![manager fileExistsAtPath:newDbName] )
     {
@@ -551,50 +583,244 @@
         return;
     }
     
+    char *error;
+    const char *sqlStatementAw = "delete from awards";
+    NSLog(@"%s",sqlStatementAw);
+    if (sqlite3_exec(databaseLocal, sqlStatementAw, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error deleting awards. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    const char *sqlStatementAw1 = "delete from awArray";
+    NSLog(@"%s",sqlStatementAw1);
+    if (sqlite3_exec(databaseLocal, sqlStatementAw1, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error deleting awards1. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    const char *sqlStatementAw2 = "delete from awDictAwardName";
+    NSLog(@"%s",sqlStatementAw2);
+    if (sqlite3_exec(databaseLocal, sqlStatementAw2, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error deleting awards2. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    const char *sqlStatementAw3 = "delete from awDictCategoryName";
+    NSLog(@"%s",sqlStatementAw3);
+    if (sqlite3_exec(databaseLocal, sqlStatementAw3, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error deleting awards3. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    const char *sqlStatementAw4 = "delete from awDictEventName";
+    NSLog(@"%s",sqlStatementAw4);
+    if (sqlite3_exec(databaseLocal, sqlStatementAw4, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error deleting awards4. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    const char *sqlStatementAw5 = "delete from awDictType";
+    NSLog(@"%s",sqlStatementAw5);
+    if (sqlite3_exec(databaseLocal, sqlStatementAw5, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSAssert1(0, @"Error deleting awards5. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    
     sqlite3 *databaseAwards = nil;
     
     if (sqlite3_open([newDbName UTF8String], &databaseAwards) != SQLITE_OK) {
         sqlite3_close(databaseAwards); //Even though the open call failed, close the database connection to release all the memory.
-        NSAssert1(0, @"Error creating awards db. '%s'", sqlite3_errmsg(databaseLocal));
+        NSAssert1(0, @"Error opening awards db. '%s'", sqlite3_errmsg(databaseLocal));
     }
+    
+    
     //eventName, eventYear, awardName, categoryName, name, tconst, winner, prisec, notes, ref, eventEditionId
-    const char *sql1 = "select ifnull(eventName,''), ifnull(eventYear,''), ifnull(awardName,''), ifnull(categoryName,''), ifnull(name,''), ifnull(tconst,''), ifnull(winner,''), ifnull(prisec,''), ifnull(notes,''), ifnull(ref,''), ifnull(eventEditionId,'') from awards";
+    const char *sql0 = "select ifnull(eventName,''), ifnull(eventYear,''), ifnull(awardName,''), ifnull(categoryName,''), ifnull(name,''), ifnull(tconst,''), ifnull(winner,''), ifnull(prisec,''), ifnull(notes,''), ifnull(ref,''), ifnull(eventEditionId,'') from awards";
     
     sqlite3_stmt *selectstmt;
-    if(sqlite3_prepare_v2(databaseAwards, sql1, -1, &selectstmt, NULL) == SQLITE_OK) {
+    sqlite3_stmt *addStmtMovieAward;
+    if(sqlite3_prepare_v2(databaseAwards, sql0, -1, &selectstmt, NULL) == SQLITE_OK) {
         
         char *insertSQLMovie = "INSERT INTO awards(eventName, eventYear, awardName, categoryName, name, tconst, winner, prisec, notes, ref, eventEditionId) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-        if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovie, NULL) != SQLITE_OK)
+        if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
             NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
         
         sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
         
         while(sqlite3_step(selectstmt) == SQLITE_ROW) {
             
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 0)] statement:addStmtMovie position:1];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 1)] statement:addStmtMovie position:2];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 2)] statement:addStmtMovie position:3];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 3)] statement:addStmtMovie position:4];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 4)] statement:addStmtMovie position:5];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 5)] statement:addStmtMovie position:6];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 6)] statement:addStmtMovie position:7];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 7)] statement:addStmtMovie position:8];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 8)] statement:addStmtMovie position:9];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 9)] statement:addStmtMovie position:10];
-            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 10)] statement:addStmtMovie position:11];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 0)] statement:addStmtMovieAward position:1];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 1)] statement:addStmtMovieAward position:2];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 2)] statement:addStmtMovieAward position:3];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 3)] statement:addStmtMovieAward position:4];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 4)] statement:addStmtMovieAward position:5];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 5)] statement:addStmtMovieAward position:6];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 6)] statement:addStmtMovieAward position:7];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 7)] statement:addStmtMovieAward position:8];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 8)] statement:addStmtMovieAward position:9];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 9)] statement:addStmtMovieAward position:10];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 10)] statement:addStmtMovieAward position:11];
             
-            if(SQLITE_DONE != sqlite3_step(addStmtMovie)) {
+            if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
                 NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
             }
-            sqlite3_reset(addStmtMovie);
+            sqlite3_reset(addStmtMovieAward);
             
         }
         sqlite3_exec(databaseLocal, "COMMIT", 0, 0, 0);
 
-        NSLog(@"finished mmovies - commit done");
+        NSLog(@"finished awards - commit done");
     }
     
     sqlite3_reset(selectstmt);
+    
+    
+    
+    const char *sql1 = "select label from awArray";
+    sqlite3_stmt *selectstmt1;
+    if(sqlite3_prepare_v2(databaseAwards, sql1, -1, &selectstmt1, NULL) == SQLITE_OK) {
+        
+        char *insertSQLMovie = "INSERT INTO awArray(label) VALUES (?)";
+        if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
+            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+        
+        sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
+        
+        while(sqlite3_step(selectstmt1) == SQLITE_ROW) {
+            
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt1, 0)] statement:addStmtMovieAward position:1];
+            
+            if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
+                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+            }
+            sqlite3_reset(addStmtMovieAward);
+            
+        }
+        sqlite3_exec(databaseLocal, "COMMIT", 0, 0, 0);
+
+        NSLog(@"finished awArray - commit done");
+    }
+    
+    sqlite3_reset(selectstmt1);
+
+    
+    
+    const char *sql2 = "select label, ifnull(name,'') from awDictAwardName";
+    sqlite3_stmt *selectstmt2;
+    if(sqlite3_prepare_v2(databaseAwards, sql2, -1, &selectstmt2, NULL) == SQLITE_OK) {
+        
+        char *insertSQLMovie = "INSERT INTO awDictAwardName(label,name) VALUES (?,?)";
+        if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
+            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+        
+        sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
+        
+        while(sqlite3_step(selectstmt2) == SQLITE_ROW) {
+            
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt2, 0)] statement:addStmtMovieAward position:1];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt2, 1)] statement:addStmtMovieAward position:2];
+            
+            if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
+                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+            }
+            sqlite3_reset(addStmtMovieAward);
+            
+        }
+        sqlite3_exec(databaseLocal, "COMMIT", 0, 0, 0);
+
+        NSLog(@"finished awDictAwardName - commit done");
+    }
+    
+    sqlite3_reset(selectstmt2);
+    
+    
+    
+    const char *sql3 = "select label, ifnull(cat,'') from awDictCategoryName";
+    sqlite3_stmt *selectstmt3;
+    if(sqlite3_prepare_v2(databaseAwards, sql3, -1, &selectstmt3, NULL) == SQLITE_OK) {
+        
+        char *insertSQLMovie = "INSERT INTO awDictCategoryName(label,cat) VALUES (?,?)";
+        if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
+            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+        
+        sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
+        
+        while(sqlite3_step(selectstmt3) == SQLITE_ROW) {
+            
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt3, 0)] statement:addStmtMovieAward position:1];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt3, 1)] statement:addStmtMovieAward position:2];
+            
+            if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
+                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+            }
+            sqlite3_reset(addStmtMovieAward);
+            
+        }
+        sqlite3_exec(databaseLocal, "COMMIT", 0, 0, 0);
+
+        NSLog(@"finished awDictCategoryName - commit done");
+    }
+    
+    sqlite3_reset(selectstmt3);
+    
+    
+    
+    const char *sql4 = "select label, ifnull(name,'') from awDictEventName";
+    sqlite3_stmt *selectstmt4;
+    if(sqlite3_prepare_v2(databaseAwards, sql4, -1, &selectstmt4, NULL) == SQLITE_OK) {
+        
+        char *insertSQLMovie = "INSERT INTO awDictEventName(label,name) VALUES (?,?)";
+        if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
+            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+        
+        sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
+        
+        while(sqlite3_step(selectstmt4) == SQLITE_ROW) {
+            
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt4, 0)] statement:addStmtMovieAward position:1];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt4, 1)] statement:addStmtMovieAward position:2];
+            
+            if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
+                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+            }
+            sqlite3_reset(addStmtMovieAward);
+            
+        }
+        sqlite3_exec(databaseLocal, "COMMIT", 0, 0, 0);
+
+        NSLog(@"finished awDictEventName - commit done");
+    }
+    
+    sqlite3_reset(selectstmt4);
+    
+    
+    
+    const char *sql5 = "select label, ifnull(type,'') from awDictType";
+    sqlite3_stmt *selectstmt5;
+    if(sqlite3_prepare_v2(databaseAwards, sql5, -1, &selectstmt5, NULL) == SQLITE_OK) {
+        
+        char *insertSQLMovie = "INSERT INTO awDictType(label,type) VALUES (?,?)";
+        if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
+            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+        
+        sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
+        
+        while(sqlite3_step(selectstmt5) == SQLITE_ROW) {
+            
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt5, 0)] statement:addStmtMovieAward position:1];
+            [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt5, 1)] statement:addStmtMovieAward position:2];
+            
+            if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
+                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+            }
+            sqlite3_reset(addStmtMovieAward);
+            
+        }
+        sqlite3_exec(databaseLocal, "COMMIT", 0, 0, 0);
+
+        NSLog(@"finished awDictEventName - commit done");
+    }
+    
+    sqlite3_reset(selectstmt5);
+
+    
+    
     
     sqlite3_close(databaseAwards);
     
@@ -606,9 +832,12 @@
     sqlite3_finalize(addStmtMovie);
     sqlite3_finalize(addStmtAkaMovie);
     sqlite3_finalize(addStmtMovieRating);
+    sqlite3_finalize(addStmtMovieEpisode);
+    sqlite3_finalize(addStmtName);
+    sqlite3_finalize(addStmtChar);
 
     sqlite3_close(databaseLocal);
-    [self printChar];
+    //[self printChar];
 }
 
 - (void) printChar {

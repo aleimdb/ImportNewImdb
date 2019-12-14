@@ -43,6 +43,7 @@
 - (void) commit;
 - (void) createIdxChar_final;
 - (void) createLocalTables;
+- (void) createAwardsTables;
 - (void) printChar;
 
 @end
