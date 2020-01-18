@@ -13,19 +13,20 @@
 int main(int argc, const char * argv[]) {
     
     if(argc != 2) {
-        NSLog(@"usage: importNewImdb path_to_folder|onlyAwards");
+        //NSLog(@"usage: importNewImdb path_to_folder|onlyAwards");
+        NSLog(@"usage: importNewImdb path_to_folder");
         return 1;
     }
     NSString* path = [NSString stringWithUTF8String:argv[1]];
     
-    if([path isEqualToString:@"onlyAwards"]) {
+    /*if([path isEqualToString:@"onlyAwards"]) {
         NSLog(@"onlyAwards detected");
         Movie* movie = [[Movie alloc] init];
         //[movie createAwardsTables];
         [movie importAwards];
         [movie closeDb];
         return 0;
-    }
+    }*/
     
     [Movie createDb];
     
@@ -359,8 +360,8 @@ int main(int argc, const char * argv[]) {
     
     @autoreleasepool {
         Movie* movie = [[Movie alloc] init];
-        [movie createAwardsTables];
-        [movie importAwards];
+        //[movie createAwardsTables];
+        //[movie importAwards];
         [movie createIdxChar_final];
         [movie createLocalTables];
         [movie closeDb];
