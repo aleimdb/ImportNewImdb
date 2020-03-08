@@ -37,13 +37,13 @@
 
 + (void) createDb;
 
-- (void) importAwards;
+//- (void) importAwards;
 - (void) closeDb;
 - (void) begin;
 - (void) commit;
 - (void) createIdxChar_final;
 - (void) createLocalTables;
-- (void) createAwardsTables;
+//- (void) createAwardsTables;
 - (void) printChar;
 
 @end

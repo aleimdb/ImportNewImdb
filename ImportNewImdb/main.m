@@ -59,7 +59,7 @@ int main(int argc, const char * argv[]) {
                     NSLog(@"discarded line: %ld %@",l, line);
             }
             if (l % 1000000ULL == 0) {
-                NSLog(@"read line: %ld of %ld", l, [reader nLines]);
+                NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
                 [movie commit];
                 [movie begin];
             }
@@ -96,7 +96,7 @@ int main(int argc, const char * argv[]) {
                     NSLog(@"discarded: %@",line);
             }
             if (l % 1000000ULL == 0) {
-                NSLog(@"read line: %ld of %ld", l, [reader nLines]);
+                NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
                 [movie commit];
                 [movie begin];
             }
@@ -133,7 +133,7 @@ int main(int argc, const char * argv[]) {
                     NSLog(@"discarded: %@",line);
             }
             if (l % 1000000ULL == 0) {
-                NSLog(@"read line: %ld of %ld", l, [reader nLines]);
+                NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
                 [movie commit];
                 [movie begin];
             }
@@ -170,7 +170,7 @@ int main(int argc, const char * argv[]) {
                     NSLog(@"discarded: %@",line);
             }
             if (l % 1000000ULL == 0) {
-                NSLog(@"read line: %ld of %ld", l, [reader nLines]);
+                NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
                 [movie commit];
                 [movie begin];
             }
@@ -216,7 +216,7 @@ int main(int argc, const char * argv[]) {
                     NSLog(@"discarded: %@",line);
             }
             if (l % 1000000ULL == 0) {
-                NSLog(@"read line: %ld of %ld - skip:%ld", l, [reader nLines], skip);
+                NSLog(@"read line: %ld of %ld (%.0lf%%) - skip:%ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skip);
                 [movie commit];
                 //[Movie printChar];
                 [movie begin];
@@ -290,7 +290,7 @@ int main(int argc, const char * argv[]) {
                     NSLog(@"discarded: %@",line);
             }
             if (l % 1000000ULL == 0) {
-                NSLog(@"read line: %ld of %ld - skipped d: %ld - skipped w: %ld", l, [reader nLines], skipd,skipw);
+                NSLog(@"read line: %ld of %ld (%.0lf%%) - skipped d: %ld - skipped w: %ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skipd,skipw);
                 [movie commit];
                 [movie begin];
             }
@@ -306,9 +306,11 @@ int main(int argc, const char * argv[]) {
         DDFileReader * reader = [[DDFileReader alloc] initWithFilePath:[path stringByAppendingString:@"/name.basics.tsv"]];
         long l = 0;
         long skip = 0;
+        long skipdup = 0;
         NSString * line = nil;
         Movie* movie = [[Movie alloc] init];
         [movie begin];
+        NSMutableArray *arrloc = [[NSMutableArray alloc] init];
         while ((line = [reader readLine])) {
             l++;
             if (l==1) {
@@ -328,18 +330,24 @@ int main(int argc, const char * argv[]) {
                     NSArray *arr2 = [arr[5] componentsSeparatedByCharactersInSet:
                                      [NSCharacterSet characterSetWithCharactersInString:@",\n"]];
                     NSInteger loc = 0;
+                    [arrloc removeAllObjects];
                     for (NSString* arrstr in arr2) {
                         if(arrstr.length==0 || [arrstr isEqualToString:@"\\N"]){
                             skip++;
                         } else {
-                            loc++;
-                            [movie insertCharacterWithNconst:arr[0]
-                                                      tconst:arrstr
-                                                       ttype:@"k"
-                                                    position:loc
-                                                    category:@"\\N"
-                                                         job:@"\\N"
-                                                  characters:@"\\N"];
+                            if([arrloc containsObject:arrstr]) {
+                                skipdup++;
+                            } else {
+                                [arrloc addObject:arrstr];
+                                loc++;
+                                [movie insertCharacterWithNconst:arr[0]
+                                                          tconst:arrstr
+                                                           ttype:@"k"
+                                                        position:loc
+                                                        category:@"\\N"
+                                                             job:@"\\N"
+                                                      characters:@"\\N"];
+                            }
                         }
                     }
                 }
@@ -347,12 +355,12 @@ int main(int argc, const char * argv[]) {
                     NSLog(@"discarded: %@",line);
             }
             if (l % 1000000ULL == 0) {
-                NSLog(@"read line: %ld of %ld - skip: %ld", l, [reader nLines], skip);
+                NSLog(@"read line: %ld of %ld (%.0lf%%) - skip: %ld %ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skip,skipdup);
                 [movie commit];
                 [movie begin];
             }
         }
-        NSLog(@"read line: %ld - skip: %ld", l, skip);
+        NSLog(@"read line: %ld - skip: %ld %ld", l, skip, skipdup);
         [movie commit];
         [movie printChar];
         [movie closeDb];

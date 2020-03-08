@@ -377,7 +377,7 @@
     }
     sqlite3_reset(statsStmt);
 }
-
+/*
 - (void) createAwardsTables {
     
     char *error;
@@ -429,7 +429,7 @@
     }
     
 }
-
+*/
 
 -(void) bindString:(NSString*)myString statement:(sqlite3_stmt*)statement position:(int)position{
     if (myString && ![myString isEqualToString:@"\\N"])
@@ -568,7 +568,7 @@
     
 }
 
-
+/*
 - (void) importAwards {
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -826,7 +826,7 @@
     
     NSLog(@"updates imported from awards file");
 }
-
+*/
 
 - (void) closeDb {
     sqlite3_finalize(addStmtMovie);
