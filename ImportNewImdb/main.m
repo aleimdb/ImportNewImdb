@@ -30,6 +30,8 @@ int main(int argc, const char * argv[]) {
     
     [Movie createDb];
     
+
+    
     //tconst	titleType	primaryTitle	originalTitle	isAdult	startYear	endYear	runtimeMinutes	genres
     @autoreleasepool {
         
@@ -306,7 +308,9 @@ int main(int argc, const char * argv[]) {
         DDFileReader * reader = [[DDFileReader alloc] initWithFilePath:[path stringByAppendingString:@"/name.basics.tsv"]];
         long l = 0;
         long skip = 0;
+        long skipdupnames = 0;
         long skipdup = 0;
+        int retval;
         NSString * line = nil;
         Movie* movie = [[Movie alloc] init];
         [movie begin];
@@ -326,41 +330,45 @@ int main(int argc, const char * argv[]) {
                                 [NSCharacterSet characterSetWithCharactersInString:@"\t\n"]];
                 
                 if(arr.count>=6) {
-                    [movie insertNameWithNconst:arr[0] primaryName:arr[1] birthYear:arr[2] deathYear:arr[3] primaryProfession:arr[4]];
-                    NSArray *arr2 = [arr[5] componentsSeparatedByCharactersInSet:
-                                     [NSCharacterSet characterSetWithCharactersInString:@",\n"]];
-                    NSInteger loc = 0;
-                    [arrloc removeAllObjects];
-                    for (NSString* arrstr in arr2) {
-                        if(arrstr.length==0 || [arrstr isEqualToString:@"\\N"]){
-                            skip++;
-                        } else {
-                            if([arrloc containsObject:arrstr]) {
-                                skipdup++;
+                    retval = [movie insertNameWithNconst:arr[0] primaryName:arr[1] birthYear:arr[2] deathYear:arr[3] primaryProfession:arr[4]];
+                    if (retval == 0) {
+                        NSArray *arr2 = [arr[5] componentsSeparatedByCharactersInSet:
+                                         [NSCharacterSet characterSetWithCharactersInString:@",\n"]];
+                        NSInteger loc = 0;
+                        [arrloc removeAllObjects];
+                        for (NSString* arrstr in arr2) {
+                            if(arrstr.length==0 || [arrstr isEqualToString:@"\\N"]){
+                                skip++;
                             } else {
-                                [arrloc addObject:arrstr];
-                                loc++;
-                                [movie insertCharacterWithNconst:arr[0]
-                                                          tconst:arrstr
-                                                           ttype:@"k"
-                                                        position:loc
-                                                        category:@"\\N"
-                                                             job:@"\\N"
-                                                      characters:@"\\N"];
+                                if([arrloc containsObject:arrstr]) {
+                                    skipdup++;
+                                } else {
+                                    [arrloc addObject:arrstr];
+                                    loc++;
+                                    [movie insertCharacterWithNconst:arr[0]
+                                                              tconst:arrstr
+                                                               ttype:@"k"
+                                                            position:loc
+                                                            category:@"\\N"
+                                                                 job:@"\\N"
+                                                          characters:@"\\N"];
+                                }
                             }
                         }
+                    } else {
+                        skipdupnames++;
                     }
                 }
                 else
                     NSLog(@"discarded: %@",line);
             }
             if (l % 1000000ULL == 0) {
-                NSLog(@"read line: %ld of %ld (%.0lf%%) - skip: %ld %ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skip,skipdup);
+                NSLog(@"read line: %ld of %ld (%.0lf%%) - skip: %ld dupchars: %ld dupnames: %ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skip, skipdup, skipdupnames);
                 [movie commit];
                 [movie begin];
             }
         }
-        NSLog(@"read line: %ld - skip: %ld %ld", l, skip, skipdup);
+        NSLog(@"read line: %ld - skip: %ld dupchars: %ld dupnames: %ld", l, skip, skipdup, skipdupnames);
         [movie commit];
         [movie printChar];
         [movie closeDb];

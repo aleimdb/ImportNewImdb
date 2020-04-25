@@ -47,7 +47,8 @@
     if (sqlite3_open([newDbName UTF8String], &databaseLocal) != SQLITE_OK) {
         sqlite3_close(databaseLocal); //Even though the open call failed, close the database connection to release all the memory.
         
-        NSAssert1(0, @"Error opening db. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error opening db. '%s'", sqlite3_errmsg(databaseLocal));
+        exit(1);
     }
     
 }
@@ -72,44 +73,59 @@
     if (sqlite3_open([newDbName UTF8String], &databaseGlobal) != SQLITE_OK) {
         sqlite3_close(databaseGlobal); //Even though the open call failed, close the database connection to release all the memory.
         
-        NSAssert1(0, @"Error creating db. '%s'", sqlite3_errmsg(databaseGlobal));
+        NSLog(@"Error creating db. '%s'", sqlite3_errmsg(databaseGlobal));
+        exit(1);
     }
     
     const char *sqlStatementMovie = "CREATE TABLE movies(tconst varchar(30), titleType varchar(30), primaryTitle varchar(255), originalTitle varchar(255), isAdult varchar(1), startYear varchar(4), endYear varchar(4), runtimeMinutes varchar(4), genres  varchar(255))";
     char *error;
     if (sqlite3_exec(databaseGlobal, sqlStatementMovie, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating movies. '%s'", sqlite3_errmsg(databaseGlobal));
+        NSLog(@"Error creating movies. '%s'", sqlite3_errmsg(databaseGlobal));
+    }
+    
+    const char *sqlStatementIdx4 = "CREATE unique INDEX idx_movies_tconst on movies(tconst)";
+    NSLog(@"%s",sqlStatementIdx4);
+    if (sqlite3_exec(databaseGlobal, sqlStatementIdx4, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSLog(@"Error creating idx_movies_tconst. '%s'", sqlite3_errmsg(databaseGlobal));
     }
     
     const char *sqlStatementAkaMovie = "CREATE TABLE akamovies(titleId varchar(30), ordering varchar(30), title varchar(255), region varchar(255), language varchar(30), types varchar(30), attributes varchar(30), isOriginalTitle  varchar(1))";
     if (sqlite3_exec(databaseGlobal, sqlStatementAkaMovie, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating akamovies. '%s'", sqlite3_errmsg(databaseGlobal));
+        NSLog(@"Error creating akamovies. '%s'", sqlite3_errmsg(databaseGlobal));
     }
     
     const char *sqlStatementName = "CREATE TABLE names(nconst varchar(30), primaryName varchar(255), birthYear varchar(4), deathYear varchar(4), primaryProfession varchar(255))";
     if (sqlite3_exec(databaseGlobal, sqlStatementName, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating names. '%s'", sqlite3_errmsg(databaseGlobal));
+        NSLog(@"Error creating names. '%s'", sqlite3_errmsg(databaseGlobal));
+    }
+    
+    const char *sqlStatementIdx5 = "CREATE unique INDEX idx_names_nconst on names(nconst)";
+    NSLog(@"%s",sqlStatementIdx5);
+    if (sqlite3_exec(databaseGlobal, sqlStatementIdx5, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSLog(@"Error creating idx_names_nconst. '%s'", sqlite3_errmsg(databaseGlobal));
     }
     
     const char *sqlStatementChar = "CREATE TABLE characters(nconst varchar(30), tconst varchar(30), ttype varchar(1), position integer, category varchar(30), job varchar(255), characters varchar(255))";
     if (sqlite3_exec(databaseGlobal, sqlStatementChar, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating characters. '%s'", sqlite3_errmsg(databaseGlobal));
+        NSLog(@"Error creating characters. '%s'", sqlite3_errmsg(databaseGlobal));
     }
     
     const char *sqlStatementRatings = "CREATE TABLE ratings(tconst varchar(30), averageRating varchar(5), numVotes varchar(15))";
     if (sqlite3_exec(databaseGlobal, sqlStatementRatings, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating ratings. '%s'", sqlite3_errmsg(databaseGlobal));
+        NSLog(@"Error creating ratings. '%s'", sqlite3_errmsg(databaseGlobal));
     }
     
     const char *sqlStatementEpisodes = "CREATE TABLE episodes(tconst varchar(30), parentTconst varchar(30), seasonNumber varchar(10), episodeNumber varchar(10))";
     if (sqlite3_exec(databaseGlobal, sqlStatementEpisodes, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating episodes. '%s'", sqlite3_errmsg(databaseGlobal));
+        NSLog(@"Error creating episodes. '%s'", sqlite3_errmsg(databaseGlobal));
     }
         
     sqlite3_close(databaseGlobal);
@@ -124,119 +140,109 @@
     NSLog(@"%s",sqlStatementIdx1);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx1, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_char_nconst. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_char_nconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx2 = "CREATE INDEX idx_char_tconst on characters(tconst)";
     NSLog(@"%s",sqlStatementIdx2);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx2, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_char_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_char_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx3 = "CREATE INDEX idx_epi_tconst on episodes(tconst)";
     NSLog(@"%s",sqlStatementIdx3);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx3, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_epi_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_epi_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx3b = "CREATE INDEX idx_epi_ptconst on episodes(parenttconst)";
     NSLog(@"%s",sqlStatementIdx3b);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx3b, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_epi_ptconst. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_epi_ptconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
-    const char *sqlStatementIdx4 = "CREATE INDEX idx_movies_tconst on movies(tconst)";
-    NSLog(@"%s",sqlStatementIdx4);
-    if (sqlite3_exec(databaseLocal, sqlStatementIdx4, NULL, NULL, &error) != SQLITE_OK)
-    {
-        NSAssert1(0, @"Error creating idx_movies_tconst. '%s'", sqlite3_errmsg(databaseLocal));
-    }
+    
     
     const char *sqlStatementIdx4b = "CREATE INDEX idx_akamovies_titleId on akamovies(titleId)";
     NSLog(@"%s",sqlStatementIdx4b);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx4b, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_akamovies_titleId. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_akamovies_titleId. '%s'", sqlite3_errmsg(databaseLocal));
     }
 
-    const char *sqlStatementIdx5 = "CREATE INDEX idx_names_nconst on names(nconst)";
-    NSLog(@"%s",sqlStatementIdx5);
-    if (sqlite3_exec(databaseLocal, sqlStatementIdx5, NULL, NULL, &error) != SQLITE_OK)
-    {
-        NSAssert1(0, @"Error creating idx_names_nconst. '%s'", sqlite3_errmsg(databaseLocal));
-    }
+    
     
     const char *sqlStatementIdx6 = "CREATE INDEX idx_ratings_tconst on ratings(tconst)";
     NSLog(@"%s",sqlStatementIdx6);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx6, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
         
     const char *sqlStatementIdx9 = "create index ratings_tconst on ratings(tconst)";
     NSLog(@"%s",sqlStatementIdx9);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx9, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx10 = "create index movies_year on movies(startyear)";
     NSLog(@"%s",sqlStatementIdx10);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx10, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx11 = "create table movieratings as select m.tconst, m.primarytitle, m.originaltitle, m.startyear,m.genres, m.titletype, cast (numvotes as number) numvotes, cast (averageRating as number) rating,'' as posit, '' as positsci from movies m, ratings where m.tconst=ratings.tconst and cast (numvotes as number)>1000 and titletype <> 'tvEpisode' order by cast (numvotes as number) desc";
     NSLog(@"%s",sqlStatementIdx11);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx11, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating movieratings. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating movieratings. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx12 = "create index movieratings_year on movieratings(startyear)";
     NSLog(@"%s",sqlStatementIdx12);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx12, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating movieratings_year. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating movieratings_year. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx13 = "create index movieratings_tconst on movieratings(tconst)";
     NSLog(@"%s",sqlStatementIdx13);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx13, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating movieratings_year. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating movieratings_year. '%s'", sqlite3_errmsg(databaseLocal));
     }
 
     const char *sqlStatementIdx14 = "CREATE INDEX idx_movies_primarytitle ON movies(primarytitle COLLATE NOCASE)";
     NSLog(@"%s",sqlStatementIdx14);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx14, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_movies_primarytitle. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_movies_primarytitle. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx15 = "CREATE INDEX idx_movies_originaltitle ON movies(originaltitle COLLATE NOCASE)";
     NSLog(@"%s",sqlStatementIdx15);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx15, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_movies_originaltitle. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_movies_originaltitle. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx16 = "CREATE INDEX idx_akamovies_title ON akamovies(title COLLATE NOCASE)";
     NSLog(@"%s",sqlStatementIdx16);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx16, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_akamovies_title. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_akamovies_title. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx18 = "CREATE INDEX idx_names_primaryname ON names(primaryname COLLATE NOCASE)";
     NSLog(@"%s",sqlStatementIdx18);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx18, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_names_primaryname. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_names_primaryname. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     NSLog(@"updating posit");
@@ -270,7 +276,7 @@
             
             if ( sqlite3_exec(databaseLocal, [updStatement UTF8String], NULL, NULL, &error) != SQLITE_OK)
             {
-                NSAssert1(0, @"Error while creating updStatement statement. '%s'", sqlite3_errmsg(databaseLocal));
+                NSLog(@"Error while creating updStatement statement. '%s'", sqlite3_errmsg(databaseLocal));
             }
             
             i++;
@@ -290,7 +296,7 @@
             
             if ( sqlite3_exec(databaseLocal, [updStatement UTF8String], NULL, NULL, &error) != SQLITE_OK)
             {
-                NSAssert1(0, @"Error while creating updStatement statement. '%s'", sqlite3_errmsg(databaseLocal));
+                NSLog(@"Error while creating updStatement statement. '%s'", sqlite3_errmsg(databaseLocal));
             }
             
             i++;
@@ -309,63 +315,63 @@
     NSLog(@"%s",sqlStatementIdx1);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx1, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx2 = "CREATE INDEX mmidx_mmovies_tconst on mmovies(tconst)";
     NSLog(@"%s",sqlStatementIdx2);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx2, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx3 = "CREATE TABLE mm_dates ( date_type varchar(100), date DATETIME, location varchar(255), notes varchar(255), channel varchar(45), price float, source varchar(45), updatedby varchar(255), tconst varchar(30), datepk INTEGER PRIMARY KEY AUTOINCREMENT )";
     NSLog(@"%s",sqlStatementIdx3);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx3, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx3b = "CREATE INDEX mmidx_mm_dates_tconst on mm_dates(tconst)";
     NSLog(@"%s",sqlStatementIdx3b);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx3b, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx4 = "CREATE TABLE mm_epi_dates ( date_type varchar(100), date DATETIME, updatedby varchar(255), parenttconst varchar(30), tconst varchar(30), datepk INTEGER PRIMARY KEY AUTOINCREMENT , seasonNumber varchar(10), episodeNumber varchar(10))";
     NSLog(@"%s",sqlStatementIdx4);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx4, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx5 = "CREATE INDEX mmidx_epi_parenttconst on mm_epi_dates(parenttconst)";
     NSLog(@"%s",sqlStatementIdx5);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx5, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx6 = "CREATE INDEX mmidx_epi_tconst on mm_epi_dates(tconst)";
     NSLog(@"%s",sqlStatementIdx6);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx6, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx7 = "CREATE TABLE mstats ( stat varchar(255) )";
     NSLog(@"%s",sqlStatementIdx7);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx7, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating mmovies_local7. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating mmovies_local7. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     sqlite3_stmt *statsStmt = nil;
     
     char *insertSQLMovie = "INSERT INTO mstats(stat) VALUES (?)";
     if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &statsStmt, NULL) != SQLITE_OK)
-        NSAssert1(0, @"Error while creating stats statement. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error while creating stats statement. '%s'", sqlite3_errmsg(databaseLocal));
     
     NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd"];
@@ -373,7 +379,7 @@
     sqlite3_bind_text(statsStmt,1,[[dateFormatter stringFromDate:[NSDate date]] UTF8String],-1,SQLITE_TRANSIENT);
     
     if(SQLITE_DONE != sqlite3_step(statsStmt)) {
-        NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
     }
     sqlite3_reset(statsStmt);
 }
@@ -385,47 +391,47 @@
     const char *sqlStatementAwards = "CREATE TABLE awards(eventEditionId varchar(50), eventName varchar(100), eventYear varchar(10), awardName varchar(255), categoryName varchar(255), name varchar(255), tconst varchar(30), winner varchar(4), prisec varchar(4), notes varchar(1024), ref varchar(30))";
     if (sqlite3_exec(databaseLocal, sqlStatementAwards, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating awards. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating awards. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx7 = "CREATE INDEX idx_awards_tconst on awards(tconst)";
     NSLog(@"%s",sqlStatementIdx7);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx7, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_awards_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_awards_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementIdx8 = "CREATE INDEX idx_awards_ref on awards(ref)";
     NSLog(@"%s",sqlStatementIdx8);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx8, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating idx_awards_ref. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating idx_awards_ref. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     const char *sqlStatementAwards1 = "CREATE TABLE awArray (label varchar(100))";
     if (sqlite3_exec(databaseLocal, sqlStatementAwards1, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating awards1. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating awards1. '%s'", sqlite3_errmsg(databaseLocal));
     }
     const char *sqlStatementAwards2 = "CREATE TABLE awDictAwardName (label varchar(100),name varchar(100))";
     if (sqlite3_exec(databaseLocal, sqlStatementAwards2, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating awards2. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating awards2. '%s'", sqlite3_errmsg(databaseLocal));
     }
     const char *sqlStatementAwards3 = "CREATE TABLE awDictCategoryName (label varchar(100),cat varchar(500))";
     if (sqlite3_exec(databaseLocal, sqlStatementAwards3, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating awards3. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating awards3. '%s'", sqlite3_errmsg(databaseLocal));
     }
     const char *sqlStatementAwards4 = "CREATE TABLE awDictEventName (label varchar(100),name varchar(100))";
     if (sqlite3_exec(databaseLocal, sqlStatementAwards4, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating awards4. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating awards4. '%s'", sqlite3_errmsg(databaseLocal));
     }
     const char *sqlStatementAwards5 = "CREATE TABLE awDictType (label varchar(100),type varchar(100))";
     if (sqlite3_exec(databaseLocal, sqlStatementAwards5, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error creating awards5. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating awards5. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
 }
@@ -444,7 +450,7 @@
     if(addStmtMovie == nil) {
         char *insertSQLMovie = "INSERT INTO movies(tconst, titleType, primaryTitle, originalTitle, isAdult, startYear, endYear, runtimeMinutes, genres) VALUES (?,?,?,?,?,?,?,?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovie, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     [self bindString:tconst statement:addStmtMovie position:1];
@@ -458,7 +464,7 @@
     [self bindString:genres statement:addStmtMovie position:9];
     
     if(SQLITE_DONE != sqlite3_step(addStmtMovie)) {
-        NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
     }
     sqlite3_reset(addStmtMovie);
 }
@@ -468,7 +474,7 @@
     if(addStmtAkaMovie == nil) {
         char *insertSQLMovie = "INSERT INTO akamovies(titleId, ordering, title, region, language, types, attributes, isOriginalTitle) VALUES (?,?,?,?,?,?,?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtAkaMovie, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     [self bindString:tconst statement:addStmtAkaMovie position:1];
@@ -481,7 +487,7 @@
     [self bindString:isOriginalTitle statement:addStmtAkaMovie position:8];
     
     if(SQLITE_DONE != sqlite3_step(addStmtAkaMovie)) {
-        NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
     }
     sqlite3_reset(addStmtAkaMovie);
 }
@@ -491,7 +497,7 @@
     if(addStmtMovieRating == nil) {
         char *insertSQLMovieRating = "INSERT INTO ratings(tconst, averageRating, numVotes) VALUES (?,?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovieRating, -1, &addStmtMovieRating, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     [self bindString:tconst statement:addStmtMovieRating position:1];
@@ -499,7 +505,7 @@
     [self bindString:numVotes statement:addStmtMovieRating position:3];
     
     if(SQLITE_DONE != sqlite3_step(addStmtMovieRating)) {
-        NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
     }
     sqlite3_reset(addStmtMovieRating);
 }
@@ -509,7 +515,7 @@
     if(addStmtMovieEpisode == nil) {
         char *insertSQLMovieEpisode = "INSERT INTO episodes(tconst, parentTconst, seasonNumber, episodeNumber) VALUES (?,?,?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovieEpisode, -1, &addStmtMovieEpisode, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     [self bindString:tconst statement:addStmtMovieEpisode position:1];
@@ -518,17 +524,18 @@
     [self bindString:episodeNumber statement:addStmtMovieEpisode position:4];
     
     if(SQLITE_DONE != sqlite3_step(addStmtMovieEpisode)) {
-        NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
     }
     sqlite3_reset(addStmtMovieEpisode);
 }
 
 //nconst	primaryName	birthYear	deathYear	primaryProfession//	knownForTitles
-- (void) insertNameWithNconst:(NSString*)nconst primaryName:(NSString*)primaryName birthYear:(NSString*)birthYear deathYear:(NSString*)deathYear primaryProfession:(NSString*)primaryProfession {
+- (int) insertNameWithNconst:(NSString*)nconst primaryName:(NSString*)primaryName birthYear:(NSString*)birthYear deathYear:(NSString*)deathYear primaryProfession:(NSString*)primaryProfession {
+    int retval=0;
     if(addStmtName == nil) {
         char *insertSQLName = "INSERT INTO names(nconst, primaryName, birthYear, deathYear, primaryProfession) VALUES (?,?,?,?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLName, -1, &addStmtName, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     [self bindString:nconst statement:addStmtName position:1];
@@ -538,16 +545,18 @@
     [self bindString:primaryProfession statement:addStmtName position:5];
     
     if(SQLITE_DONE != sqlite3_step(addStmtName)) {
-        NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+        //NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+        retval=1;
     }
     sqlite3_reset(addStmtName);
+    return retval;
 }
 
 - (void) insertCharacterWithNconst:(NSString*)nconst tconst:(NSString*)tconst ttype:(NSString*)ttype position:(NSInteger) position category:(NSString*)category job:(NSString*)job characters:(NSString*)characters{
     if(addStmtChar == nil) {
         char *insertSQLChar = "INSERT INTO characters(nconst, tconst, ttype, position, category, job, characters) VALUES (?,?,?,?,?,?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLChar, -1, &addStmtChar, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     [self bindString:nconst statement:addStmtChar position:1];
@@ -559,7 +568,7 @@
     [self bindString:characters statement:addStmtChar position:7];
     
     if(SQLITE_DONE != sqlite3_step(addStmtChar)) {
-        //NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+        //NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
         countCharFailed++;
     } else {
         countChar++;
@@ -588,37 +597,37 @@
     NSLog(@"%s",sqlStatementAw);
     if (sqlite3_exec(databaseLocal, sqlStatementAw, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error deleting awards. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error deleting awards. '%s'", sqlite3_errmsg(databaseLocal));
     }
     const char *sqlStatementAw1 = "delete from awArray";
     NSLog(@"%s",sqlStatementAw1);
     if (sqlite3_exec(databaseLocal, sqlStatementAw1, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error deleting awards1. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error deleting awards1. '%s'", sqlite3_errmsg(databaseLocal));
     }
     const char *sqlStatementAw2 = "delete from awDictAwardName";
     NSLog(@"%s",sqlStatementAw2);
     if (sqlite3_exec(databaseLocal, sqlStatementAw2, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error deleting awards2. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error deleting awards2. '%s'", sqlite3_errmsg(databaseLocal));
     }
     const char *sqlStatementAw3 = "delete from awDictCategoryName";
     NSLog(@"%s",sqlStatementAw3);
     if (sqlite3_exec(databaseLocal, sqlStatementAw3, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error deleting awards3. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error deleting awards3. '%s'", sqlite3_errmsg(databaseLocal));
     }
     const char *sqlStatementAw4 = "delete from awDictEventName";
     NSLog(@"%s",sqlStatementAw4);
     if (sqlite3_exec(databaseLocal, sqlStatementAw4, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error deleting awards4. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error deleting awards4. '%s'", sqlite3_errmsg(databaseLocal));
     }
     const char *sqlStatementAw5 = "delete from awDictType";
     NSLog(@"%s",sqlStatementAw5);
     if (sqlite3_exec(databaseLocal, sqlStatementAw5, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSAssert1(0, @"Error deleting awards5. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error deleting awards5. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     
@@ -626,7 +635,7 @@
     
     if (sqlite3_open([newDbName UTF8String], &databaseAwards) != SQLITE_OK) {
         sqlite3_close(databaseAwards); //Even though the open call failed, close the database connection to release all the memory.
-        NSAssert1(0, @"Error opening awards db. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error opening awards db. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
     
@@ -639,7 +648,7 @@
         
         char *insertSQLMovie = "INSERT INTO awards(eventName, eventYear, awardName, categoryName, name, tconst, winner, prisec, notes, ref, eventEditionId) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
         
         sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
         
@@ -658,7 +667,7 @@
             [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 10)] statement:addStmtMovieAward position:11];
             
             if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
-                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+                NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
             }
             sqlite3_reset(addStmtMovieAward);
             
@@ -678,7 +687,7 @@
         
         char *insertSQLMovie = "INSERT INTO awArray(label) VALUES (?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
         
         sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
         
@@ -687,7 +696,7 @@
             [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt1, 0)] statement:addStmtMovieAward position:1];
             
             if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
-                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+                NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
             }
             sqlite3_reset(addStmtMovieAward);
             
@@ -707,7 +716,7 @@
         
         char *insertSQLMovie = "INSERT INTO awDictAwardName(label,name) VALUES (?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
         
         sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
         
@@ -717,7 +726,7 @@
             [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt2, 1)] statement:addStmtMovieAward position:2];
             
             if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
-                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+                NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
             }
             sqlite3_reset(addStmtMovieAward);
             
@@ -737,7 +746,7 @@
         
         char *insertSQLMovie = "INSERT INTO awDictCategoryName(label,cat) VALUES (?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
         
         sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
         
@@ -747,7 +756,7 @@
             [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt3, 1)] statement:addStmtMovieAward position:2];
             
             if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
-                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+                NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
             }
             sqlite3_reset(addStmtMovieAward);
             
@@ -767,7 +776,7 @@
         
         char *insertSQLMovie = "INSERT INTO awDictEventName(label,name) VALUES (?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
         
         sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
         
@@ -777,7 +786,7 @@
             [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt4, 1)] statement:addStmtMovieAward position:2];
             
             if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
-                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+                NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
             }
             sqlite3_reset(addStmtMovieAward);
             
@@ -797,7 +806,7 @@
         
         char *insertSQLMovie = "INSERT INTO awDictType(label,type) VALUES (?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovie, -1, &addStmtMovieAward, NULL) != SQLITE_OK)
-            NSAssert1(0, @"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
+            NSLog(@"Error while creating add statement. '%s'", sqlite3_errmsg(databaseLocal));
         
         sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
         
@@ -807,7 +816,7 @@
             [self bindString:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt5, 1)] statement:addStmtMovieAward position:2];
             
             if(SQLITE_DONE != sqlite3_step(addStmtMovieAward)) {
-                NSAssert1(0, @"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+                NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
             }
             sqlite3_reset(addStmtMovieAward);
             
