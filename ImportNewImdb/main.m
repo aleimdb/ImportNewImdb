@@ -30,8 +30,6 @@ int main(int argc, const char * argv[]) {
     
     [Movie createDb];
     
-
-    
     //tconst	titleType	primaryTitle	originalTitle	isAdult	startYear	endYear	runtimeMinutes	genres
     @autoreleasepool {
         
@@ -107,7 +105,7 @@ int main(int argc, const char * argv[]) {
         [movie commit];
         [movie closeDb];
     }
-    
+ 
     //tconst	averageRating	numVotes
     @autoreleasepool {
         DDFileReader * reader = [[DDFileReader alloc] initWithFilePath:[path stringByAppendingString:@"/title.ratings.tsv"]];
@@ -382,6 +380,7 @@ int main(int argc, const char * argv[]) {
         [movie createLocalTables];
         [movie closeDb];
     }
+  
     
     return 0;
 }

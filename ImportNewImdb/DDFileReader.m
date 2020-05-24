@@ -102,7 +102,7 @@
         
         lineDelimiter = @"\n";
         currentOffset = 0ULL;
-        chunkSize = 1024000ULL;
+        chunkSize = 2048000ULL;
         [fileHandle seekToEndOfFile];
         totalFileLength = [fileHandle offsetInFile];
         //we don't need to seek back, since readLine will do that.
@@ -142,24 +142,28 @@
         
         NSString* prevChunkRemainString = [prevChunkString substringWithRange:NSMakeRange(offsetInPrevChunkString,[prevChunkString length]-offsetInPrevChunkString)];
         
-        [fileHandle seekToFileOffset:currentOffset];
         NSString* newChunkString;
         @autoreleasepool {
-            NSData * newChunk = [fileHandle readDataOfLength:chunkSize];
-            currentOffset += [newChunk length];
+            NSData * newChunk;
+            for(NSUInteger i=0;i<=3;i++) {
+                [fileHandle seekToFileOffset:currentOffset];
+                if (i>0) NSLog(@"i %lu",(unsigned long)i);
+                newChunk = [fileHandle readDataOfLength:(chunkSize+i)];
+                newChunkString = [[NSString alloc] initWithData:newChunk encoding:NSUTF8StringEncoding];
+                if(newChunkString!=nil)
+                    break;
+            }
             
-            newChunkString = [[NSString alloc] initWithData:newChunk encoding:NSUTF8StringEncoding];
+            currentOffset += [newChunk length];
             if(newChunkString==nil) {
-                newChunkString = [[NSString alloc] initWithData:newChunk encoding:NSISOLatin1StringEncoding];
+                //newChunkString = [[NSString alloc] initWithData:newChunk encoding:NSISOLatin1StringEncoding];
+                NSLog(@"wrong format: - not UTF8");
+                exit(-1);
             }
         }
         prevChunkString = [prevChunkRemainString stringByAppendingString:newChunkString];
         offsetInPrevChunkString = 0ULL;
 
-//        [prevChunkRemain appendData:newChunk];
-//        prevChunk = prevChunkRemain;
-//        prevChunkString = [[NSString alloc] initWithData:prevChunk encoding:NSUTF8StringEncoding];
-        
         newLineRange = [prevChunkString rangeOfString:lineDelimiter options:NSLiteralSearch range:NSMakeRange(offsetInPrevChunkString,[prevChunkString length]-offsetInPrevChunkString) ];
         
         if (newLineRange.location != NSNotFound) {
