@@ -147,7 +147,7 @@
             NSData * newChunk;
             for(NSUInteger i=0;i<=3;i++) {
                 [fileHandle seekToFileOffset:currentOffset];
-                if (i>0) NSLog(@"i %lu",(unsigned long)i);
+                if (i>1) NSLog(@"warning i %lu - offset: %llu",(unsigned long)i,currentOffset);
                 newChunk = [fileHandle readDataOfLength:(chunkSize+i)];
                 newChunkString = [[NSString alloc] initWithData:newChunk encoding:NSUTF8StringEncoding];
                 if(newChunkString!=nil)

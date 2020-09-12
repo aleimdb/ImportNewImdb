@@ -122,6 +122,13 @@
         NSLog(@"Error creating ratings. '%s'", sqlite3_errmsg(databaseGlobal));
     }
     
+    const char *sqlStatementIdx6 = "CREATE unique INDEX idx_ratings_tconst on ratings(tconst)";
+    NSLog(@"%s",sqlStatementIdx6);
+    if (sqlite3_exec(databaseGlobal, sqlStatementIdx6, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSLog(@"Error creating idx_ratings_tconst. '%s'", sqlite3_errmsg(databaseGlobal));
+    }
+    
     const char *sqlStatementEpisodes = "CREATE TABLE episodes(tconst varchar(30), parentTconst varchar(30), seasonNumber varchar(10), episodeNumber varchar(10))";
     if (sqlite3_exec(databaseGlobal, sqlStatementEpisodes, NULL, NULL, &error) != SQLITE_OK)
     {
@@ -173,8 +180,7 @@
         NSLog(@"Error creating idx_akamovies_titleId. '%s'", sqlite3_errmsg(databaseLocal));
     }
 
-    
-    
+/*
     const char *sqlStatementIdx6 = "CREATE INDEX idx_ratings_tconst on ratings(tconst)";
     NSLog(@"%s",sqlStatementIdx6);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx6, NULL, NULL, &error) != SQLITE_OK)
@@ -188,15 +194,16 @@
     {
         NSLog(@"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
     }
+*/
     
     const char *sqlStatementIdx10 = "create index movies_year on movies(startyear)";
     NSLog(@"%s",sqlStatementIdx10);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx10, NULL, NULL, &error) != SQLITE_OK)
     {
-        NSLog(@"Error creating ratings_tconst. '%s'", sqlite3_errmsg(databaseLocal));
+        NSLog(@"Error creating movies_year. '%s'", sqlite3_errmsg(databaseLocal));
     }
     
-    const char *sqlStatementIdx11 = "create table movieratings as select m.tconst, m.primarytitle, m.originaltitle, m.startyear,m.genres, m.titletype, cast (numvotes as number) numvotes, cast (averageRating as number) rating,'' as posit, '' as positsci from movies m, ratings where m.tconst=ratings.tconst and cast (numvotes as number)>1000 and titletype <> 'tvEpisode' order by cast (numvotes as number) desc";
+    const char *sqlStatementIdx11 = "create table movieratings as select distinct m.tconst, m.primarytitle, m.originaltitle, m.startyear,m.genres, m.titletype, cast (numvotes as number) numvotes, cast (averageRating as number) rating,'' as posit, '' as positsci from movies m, ratings where m.tconst=ratings.tconst and cast (numvotes as number)>100 and titletype <> 'tvEpisode' order by cast (numvotes as number) desc";
     NSLog(@"%s",sqlStatementIdx11);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx11, NULL, NULL, &error) != SQLITE_OK)
     {
@@ -493,7 +500,8 @@
 }
 
 //tconst	averageRating	numVotes
-- (void) insertMovieRatingWithTconst:(NSString*)tconst averageRating:(NSString*)averageRating numVotes:(NSString*)numVotes {
+- (BOOL) insertMovieRatingWithTconst:(NSString*)tconst averageRating:(NSString*)averageRating numVotes:(NSString*)numVotes {
+    BOOL isdup = false;
     if(addStmtMovieRating == nil) {
         char *insertSQLMovieRating = "INSERT INTO ratings(tconst, averageRating, numVotes) VALUES (?,?,?)";
         if(sqlite3_prepare_v2(databaseLocal, insertSQLMovieRating, -1, &addStmtMovieRating, NULL) != SQLITE_OK)
@@ -505,9 +513,14 @@
     [self bindString:numVotes statement:addStmtMovieRating position:3];
     
     if(SQLITE_DONE != sqlite3_step(addStmtMovieRating)) {
-        NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
+        NSString* err = [NSString stringWithUTF8String:(char *)sqlite3_errmsg(databaseLocal)];
+        if ( [err containsString:@"UNIQUE constraint"])
+            isdup=true;
+        else
+            NSLog(@"Error while inserting data. '%s'", sqlite3_errmsg(databaseLocal));
     }
     sqlite3_reset(addStmtMovieRating);
+    return isdup;
 }
 
 //tconst	parentTconst	seasonNumber	episodeNumber
