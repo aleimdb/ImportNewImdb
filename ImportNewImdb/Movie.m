@@ -268,6 +268,7 @@
     while(sqlite3_step(selectstmt) == SQLITE_ROW) {
         
         NSString* year = [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 0)];
+        NSLog(@"%@",year);
         
         sqlite3_bind_text(selectstmt1, 1, [year UTF8String], -1, SQLITE_TRANSIENT);
         
