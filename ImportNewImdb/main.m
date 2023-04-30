@@ -60,9 +60,13 @@ int main(int argc, const char * argv[]) {
             }
             if (l % 1000000ULL == 0) {
                 NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
-                [movie commit];
-                [movie begin];
+                //[movie commit];
+                //[movie begin];
             }
+        }
+        if (l==0) {
+            NSLog(@"title.basics is null");
+            exit(-1);
         }
         NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
         [movie commit];
@@ -97,9 +101,13 @@ int main(int argc, const char * argv[]) {
             }
             if (l % 1000000ULL == 0) {
                 NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
-                [movie commit];
-                [movie begin];
+                //[movie commit];
+                //[movie begin];
             }
+        }
+        if (l==0) {
+            NSLog(@"title.akas is null");
+            exit(-1);
         }
         NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
         [movie commit];
@@ -137,9 +145,13 @@ int main(int argc, const char * argv[]) {
             }
             if (l % 1000000ULL == 0) {
                 NSLog(@"read line: %ld of %ld (%.0lf%%) dup: %ld", l, [reader nLines], floor(100.0*l/[reader nLines]),countdup);
-                [movie commit];
-                [movie begin];
+                //[movie commit];
+                //[movie begin];
             }
+        }
+        if (l==0) {
+            NSLog(@"title.ratings is null");
+            exit(-1);
         }
         NSLog(@"read line: %ld of %ld (%.0lf%%) dup: %ld", l, [reader nLines], floor(100.0*l/[reader nLines]),countdup);
         [movie commit];
@@ -174,9 +186,13 @@ int main(int argc, const char * argv[]) {
             }
             if (l % 1000000ULL == 0) {
                 NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
-                [movie commit];
-                [movie begin];
+                //[movie commit];
+                //[movie begin];
             }
+        }
+        if (l==0) {
+            NSLog(@"title.episode is null");
+            exit(-1);
         }
         NSLog(@"read line: %ld of %ld (%.0lf%%)", l, [reader nLines], floor(100.0*l/[reader nLines]));
         [movie commit];
@@ -220,10 +236,14 @@ int main(int argc, const char * argv[]) {
             }
             if (l % 1000000ULL == 0) {
                 NSLog(@"read line: %ld of %ld (%.0lf%%) - skip:%ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skip);
-                [movie commit];
+                //[movie commit];
                 //[Movie printChar];
-                [movie begin];
+                //[movie begin];
             }
+        }
+        if (l==0) {
+            NSLog(@"title.principals is null");
+            exit(-1);
         }
         NSLog(@"read line: %ld of %ld (%.0lf%%) - skip:%ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skip);
         [movie commit];
@@ -294,9 +314,13 @@ int main(int argc, const char * argv[]) {
             }
             if (l % 1000000ULL == 0) {
                 NSLog(@"read line: %ld of %ld (%.0lf%%) - skipped d: %ld - skipped w: %ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skipd,skipw);
-                [movie commit];
-                [movie begin];
+                //[movie commit];
+                //[movie begin];
             }
+        }
+        if (l==0) {
+            NSLog(@"title.crew is null");
+            exit(-1);
         }
         NSLog(@"read line: %ld of %ld (%.0lf%%) - skipped d: %ld - skipped w: %ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skipd,skipw);
         [movie commit];
@@ -365,9 +389,13 @@ int main(int argc, const char * argv[]) {
             }
             if (l % 1000000ULL == 0) {
                 NSLog(@"read line: %ld of %ld (%.0lf%%) - skip: %ld dupchars: %ld dupnames: %ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skip, skipdup, skipdupnames);
-                [movie commit];
-                [movie begin];
+                //[movie commit];
+                //[movie begin];
             }
+        }
+        if (l==0) {
+            NSLog(@"name.basic is null");
+            exit(-1);
         }
         NSLog(@"read line: %ld of %ld (%.0lf%%) - skip: %ld dupchars: %ld dupnames: %ld", l, [reader nLines], floor(100.0*l/[reader nLines]), skip, skipdup, skipdupnames);
         [movie commit];

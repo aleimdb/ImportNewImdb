@@ -113,6 +113,17 @@
         @autoreleasepool {
             NSData* prevChunk = [fileHandle readDataOfLength:chunkSize];
             prevChunkString = [[NSString alloc] initWithData:prevChunk encoding:NSUTF8StringEncoding];
+            if(prevChunkString == nil) {
+                NSLog(@"chunk null");
+                chunkSize=chunkSize+1L;
+                [fileHandle seekToFileOffset:currentOffset];
+                prevChunk = [fileHandle readDataOfLength:chunkSize];
+                prevChunkString = [[NSString alloc] initWithData:prevChunk encoding:NSUTF8StringEncoding];
+            }
+            if(prevChunkString == nil) {
+                NSLog(@"chunk null 2");
+                exit(-1);
+            }
             currentOffset += [prevChunk length];
             offsetInPrevChunkString = 0ULL;
         }

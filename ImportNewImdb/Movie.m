@@ -50,7 +50,9 @@
         NSLog(@"Error opening db. '%s'", sqlite3_errmsg(databaseLocal));
         exit(1);
     }
-    
+    char *error;
+    sqlite3_exec(databaseLocal, "PRAGMA synchronous = OFF", NULL, NULL, &error);
+    sqlite3_exec(databaseLocal, "PRAGMA journal_mode = MEMORY", NULL, NULL, &error);
 }
 
 + (void) createDb {
@@ -77,8 +79,13 @@
         exit(1);
     }
     
-    const char *sqlStatementMovie = "CREATE TABLE movies(tconst varchar(30), titleType varchar(30), primaryTitle varchar(255), originalTitle varchar(255), isAdult varchar(1), startYear varchar(4), endYear varchar(4), runtimeMinutes varchar(4), genres  varchar(255))";
     char *error;
+    
+    sqlite3_exec(databaseGlobal, "PRAGMA synchronous = OFF", NULL, NULL, &error);
+    sqlite3_exec(databaseGlobal, "PRAGMA journal_mode = MEMORY", NULL, NULL, &error);
+    
+    const char *sqlStatementMovie = "CREATE TABLE movies(tconst varchar(30), titleType varchar(30), primaryTitle varchar(255), originalTitle varchar(255), isAdult varchar(1), startYear varchar(4), endYear varchar(4), runtimeMinutes varchar(4), genres  varchar(255))";
+    
     if (sqlite3_exec(databaseGlobal, sqlStatementMovie, NULL, NULL, &error) != SQLITE_OK)
     {
         NSLog(@"Error creating movies. '%s'", sqlite3_errmsg(databaseGlobal));
@@ -268,7 +275,7 @@
     while(sqlite3_step(selectstmt) == SQLITE_ROW) {
         
         NSString* year = [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstmt, 0)];
-        NSLog(@"%@",year);
+        NSLog(@"%@ - 1",year);
         
         sqlite3_bind_text(selectstmt1, 1, [year UTF8String], -1, SQLITE_TRANSIENT);
         
@@ -291,7 +298,7 @@
         }
         sqlite3_reset(selectstmt1);
         
-        
+        NSLog(@"%@ - 2",year);
         sqlite3_bind_text(selectstmt2, 1, [year UTF8String], -1, SQLITE_TRANSIENT);
         
         i = 1;
@@ -322,6 +329,20 @@
     const char *sqlStatementIdx1 = "CREATE TABLE mmovies ( whereis varchar(50), seen varchar(1), itatitle varchar(255), notes varchar(50), type varchar(10), myvote integer, myid INTEGER PRIMARY KEY AUTOINCREMENT, updatedby varchar(255), title_imdb varchar(255), date_imdb varchar(30), tconst varchar(30) )";
     NSLog(@"%s",sqlStatementIdx1);
     if (sqlite3_exec(databaseLocal, sqlStatementIdx1, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx61 = "CREATE TABLE mmfavourites ( favid INTEGER PRIMARY KEY AUTOINCREMENT, tconst varchar(30), title_imdb varchar(255), date_imdb varchar(30), insertdate DATETIME )";
+    NSLog(@"%s",sqlStatementIdx61);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx61, NULL, NULL, &error) != SQLITE_OK)
+    {
+        NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
+    }
+    
+    const char *sqlStatementIdx62 = "CREATE INDEX mmidx_fav_tconst on mmfavourites(tconst)";
+    NSLog(@"%s",sqlStatementIdx62);
+    if (sqlite3_exec(databaseLocal, sqlStatementIdx62, NULL, NULL, &error) != SQLITE_OK)
     {
         NSLog(@"Error creating mmovies_local. '%s'", sqlite3_errmsg(databaseLocal));
     }
@@ -868,10 +889,20 @@
 }
 
 - (void) begin {
+    char *error;
+    sqlite3_exec(databaseLocal, "BEGIN TRANSACTION", NULL, NULL, &error);
+}
+
+- (void) commit {
+    char *error;
+    sqlite3_exec(databaseLocal, "END TRANSACTION", NULL, NULL, &error);
+}
+/*
+- (void) begin {
     sqlite3_exec(databaseLocal, "BEGIN", 0, 0, 0);
 }
 - (void) commit {
     sqlite3_exec(databaseLocal, "COMMIT", 0, 0, 0);
-}
+}*/
 
 @end
